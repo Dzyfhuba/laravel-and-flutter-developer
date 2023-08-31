@@ -52,7 +52,7 @@ class PostsController extends Controller
                 'post' => $post
             ], 201);
         } catch (\Exception $e) {
-            return response($e->getMessage(), 500);
+            return response($e->getMessage(), $e->getCode());
         }
     }
 
@@ -69,7 +69,28 @@ class PostsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|string|max:255|min:5',
+                'content' => 'required|string|min:5',
+                'published_date' => 'required|date_format:Y-m-d',
+                'status' => 'required|boolean'
+            ]);
+
+            if ($validator->fails())
+                return response($validator->getMessageBag(), 400);
+
+            $post = Post::find($id);
+
+            $post->update($request->all());
+
+            return response([
+                'message' => 'post updated',
+                'post' => $post
+            ], 201);
+        } catch (\Exception $e) {
+            return response($e->getMessage(), $e->getCode());
+        }
     }
 
     /**
@@ -77,6 +98,15 @@ class PostsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $post = Post::find($id);
+            $post->delete();
+
+            return response([
+                'message' => 'post deleted'
+            ]);
+        } catch (\Exception $e) {
+            return response($e->getMessage(), $e->getCode());
+        }
     }
 }
