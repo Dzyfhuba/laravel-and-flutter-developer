@@ -23,7 +23,7 @@ Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login'])
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
-    Route::get('/posts', function() {
-        return response('test');
-    });
+    
+    Route::get('/posts', [App\Http\Controllers\Api\PostsController::class, 'index']);
+    Route::post('/posts', [App\Http\Controllers\Api\PostsController::class, 'store']);
 });
