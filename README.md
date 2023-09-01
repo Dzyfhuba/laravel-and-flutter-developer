@@ -5,7 +5,7 @@
 1. cloning
 ```bash
 git clone https://github.com/Dzyfhuba/laravel-and-flutter-developer.git test-hafidz
-cd test-hafidz
+cd test-hafidz/laravel
 cp .env.example .env
 ```
 
