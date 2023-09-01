@@ -42,12 +42,12 @@ class PostResource extends Resource
         $model = PostResource::$model;
         return $table
             ->columns([
-                TextColumn::make('title')->sortable(),
-                TextColumn::make('author')->sortable(),
+                TextColumn::make('title')->sortable()->searchable(),
+                TextColumn::make('author')->sortable()->searchable(),
                 TextColumn::make('status')->sortable(),
                 TextColumn::make('likes')->sortable(),
                 TextColumn::make('dislikes')->sortable(),
-                TextColumn::make('published_date')->date('Y-m-d h:m:s')->sortable(),
+                TextColumn::make('published_date')->date('Y-m-d H:i:s')->sortable(),
                 TextColumn::make('updated_at')->sortable(),
                 // TextColumn::make('comments.id')->exists('comments')
             ])

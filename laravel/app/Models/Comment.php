@@ -17,9 +17,9 @@ class Comment extends Model
         'comment'
     ];
 
-    public function user(): HasOne
+    public function user(): BelongsTo
     {
-        return $this->hasOne(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function post(): BelongsTo

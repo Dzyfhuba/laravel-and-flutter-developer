@@ -43,19 +43,21 @@ class CommentResource extends Resource
             ->columns([
                 TextColumn::make('comment'),
                 TextColumn::make('post_id'),
-                TextColumn::make('users.name'),
+                TextColumn::make('user.name'),
+                TextColumn::make('updated_at')->date('Y-M-d'),
                 // Section::make('User')->relationship('users')
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
+                // Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ])
             ->emptyStateActions([
                 // Tables\Actions\CreateAction::make(),
