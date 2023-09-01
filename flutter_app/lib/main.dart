@@ -1,6 +1,6 @@
-import 'dart:io';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -27,15 +27,50 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginForm extends State<LoginPage> {
-  String _email = "";
-  String _password = "";
+  TextEditingController emailField = TextEditingController();
+  TextEditingController passwordField = TextEditingController();
   final _form = GlobalKey<FormState>();
   bool _isValid = false;
+  Map<String, dynamic> resposeErrorMessage = {
+    // "email": [],
+    // "password": [],
+  };
+  String? resposeSuccessMessage;
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     setState(() {
       _isValid = _form.currentState!.validate();
     });
+    if (_form.currentState!.validate()) {
+      formSubmit();
+      debugPrint(emailField.text);
+      debugPrint(passwordField.text);
+    }
+  }
+
+  Future<void> formSubmit() async {
+    if (_isValid) {
+      var data = await http.post(Uri.http("192.168.131.28:8000", '/api/login'),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            'email': emailField.text,
+            'password': passwordField.text,
+          }));
+
+      final Map<String, dynamic> body = jsonDecode(data.body);
+
+      if (data.statusCode == 400) {
+        setState(() {
+          resposeErrorMessage = body;
+        });
+      }
+      debugPrint(data.body);
+      if (data.statusCode == 201) {
+        setState(() {
+          resposeSuccessMessage = body['message'];
+        });
+      }
+    }
   }
 
   @override
@@ -57,8 +92,14 @@ class LoginForm extends State<LoginPage> {
                         decoration: TextDecoration.underline)),
               ),
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  // errorText: resposeMessage.containsKey("email") && resposeMessage['email'] != []
+                  //     ? resposeMessage['email'].toString()
+                  //     : null
+                ),
                 keyboardType: TextInputType.emailAddress,
+                controller: emailField,
                 validator: (value) {
                   // Check if this field is empty
                   if (value == null || value.isEmpty) {
@@ -76,7 +117,9 @@ class LoginForm extends State<LoginPage> {
               ),
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Password'),
-                keyboardType: TextInputType.emailAddress,
+                controller: passwordField,
+                keyboardType: TextInputType.visiblePassword,
+                obscureText: true,
                 validator: (value) {
                   // Check if this field is empty
                   if (value == null || value.isEmpty) {
@@ -94,8 +137,20 @@ class LoginForm extends State<LoginPage> {
                     style: const ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll(
                             Color.fromRGBO(230, 138, 0, 1))),
-                    child: const Text('Login', style: TextStyle(color: Colors.black),)),
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(color: Colors.black),
+                    )),
               ),
+              resposeErrorMessage.containsKey("message")
+                  ? Text(
+                      resposeErrorMessage['message'],
+                      style: const TextStyle(color: Colors.red),
+                    )
+                  : Container(),
+              resposeSuccessMessage != null
+                  ? Text(resposeSuccessMessage!)
+                  : Container()
             ],
           ),
         ),
