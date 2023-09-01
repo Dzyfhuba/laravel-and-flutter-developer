@@ -9,17 +9,24 @@ class Posts extends StatefulWidget {
 }
 
 class PostsState extends State<Posts> {
+  String? _token;
+  int _counter = 0;
+
   Future<void> getData() async {
     final prefs = await SharedPreferences.getInstance();
 
     String? token = prefs.getString('token');
-    debugPrint(token);
+    setState(() {
+      _token = token;
+    });
   }
 
   @override
   void initState() {
     super.initState();
     getData();
+    // SharedPreferences.getInstance()
+    //     .then((value) => _token = value.getString('token'));
   }
 
   @override
@@ -31,16 +38,28 @@ class PostsState extends State<Posts> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton(
-                onPressed: () {
-                  getData();
-                },
-                style: const ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(
-                        Color.fromRGBO(230, 138, 0, 1))),
-                child: const Text(
-                  'Login',
-                  style: TextStyle(color: Colors.black),
-                )),
+              onPressed: () {
+                getData();
+                SharedPreferences.getInstance().then((value) {
+                  setState(() {
+                    _token = value.getString('token');
+                  });
+                  debugPrint(value.getString('token'));
+                });
+                setState(() {
+                  _counter++;
+                });
+              },
+              style: const ButtonStyle(
+                  backgroundColor:
+                      MaterialStatePropertyAll(Color.fromRGBO(230, 138, 0, 1))),
+              child: const Text(
+                'Login',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            Text(_token.toString()),
+            Text(_counter.toString()),
           ],
         ),
       ),
