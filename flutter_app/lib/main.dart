@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/posts.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   // runApp(const MyApp());
@@ -45,7 +46,6 @@ class LoginForm extends State<LoginPage> {
     // "password": [],
   };
   String? resposeSuccessMessage;
-
   Future<bool> _saveForm() async {
     setState(() {
       _isValid = _form.currentState!.validate();
@@ -78,7 +78,12 @@ class LoginForm extends State<LoginPage> {
       if (data.statusCode == 201) {
         setState(() {
           resposeSuccessMessage = body['message'];
+          resposeErrorMessage = {};
         });
+        // obtain shared preferences
+        final prefs = await SharedPreferences.getInstance();
+
+        await prefs.setString('token', body['token']);
       }
     }
   }
@@ -147,10 +152,9 @@ class LoginForm extends State<LoginPage> {
                       _saveForm().then(
                         (value) {
                           if (value) {
-                            Navigator.of(context).pushReplacementNamed("/posts");
-                          } else {
-
-                          }
+                            Navigator.of(context)
+                                .pushReplacementNamed("/posts");
+                          } else {}
                         },
                       );
                       // Navigator.of(context).pushNamed("/posts");
