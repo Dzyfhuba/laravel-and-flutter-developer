@@ -28,9 +28,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts', [App\Http\Controllers\Api\PostsController::class, 'store']);
     Route::put('/posts/{id}', [App\Http\Controllers\Api\PostsController::class, 'update']);
     Route::delete('/posts/{id}', [App\Http\Controllers\Api\PostsController::class, 'destroy']);
-
+    
     Route::get('/posts/{id}/comments', [App\Http\Controllers\Api\PostCommentsController::class, 'index']);
     Route::post('/posts/{id}/comments', [App\Http\Controllers\Api\PostCommentsController::class, 'store']);
     Route::put('/posts/comments/{comment_id}', [App\Http\Controllers\Api\PostCommentsController::class, 'update']);
     Route::delete('/posts/comments/{comment_id}', [App\Http\Controllers\Api\PostCommentsController::class, 'destroy']);
+
+    // Route::get('/posts/{id}/{param}', [App\Http\Controllers\Api\PostsController::class, 'likeDislike']);
+    Route::get('/posts/{id}/like', [App\Http\Controllers\Api\PostsController::class, 'like']);
+    Route::get('/posts/{id}/dislike', [App\Http\Controllers\Api\PostsController::class, 'dislike']);
 });

@@ -18,7 +18,8 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class);
             $table->foreignIdFor(Post::class);
-            $table->boolean('like');
+            $table->boolean('like')->default(false);
+            $table->boolean('dislike')->default(false);
             $table->timestamps();
         });
     }
