@@ -1,9 +1,18 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/posts.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
-  runApp(const MyApp());
+  // runApp(const MyApp());
+  runApp(MaterialApp(
+    // home: const LoginPage(title: Text('posts')),
+    initialRoute: '/',
+    routes: <String, WidgetBuilder>{
+      '/': (context) => const LoginPage(title: Text('posts')),
+      '/posts': (context) => const Posts(title: Text('posts')),
+    },
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -12,15 +21,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'State Example',
-      home: LoginPage(title: 'State Example'),
+      title: 'Posts LAh',
+      home: LoginPage(title: Text('posts')),
     );
   }
 }
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  final Text title;
 
   @override
   State<StatefulWidget> createState() => LoginForm();
@@ -37,15 +46,16 @@ class LoginForm extends State<LoginPage> {
   };
   String? resposeSuccessMessage;
 
-  Future<void> _saveForm() async {
+  Future<bool> _saveForm() async {
     setState(() {
       _isValid = _form.currentState!.validate();
     });
     if (_form.currentState!.validate()) {
-      formSubmit();
-      debugPrint(emailField.text);
-      debugPrint(passwordField.text);
+      await formSubmit();
+      // debugPrint(emailField.text);
+      // debugPrint(passwordField.text);
     }
+    return _form.currentState!.validate();
   }
 
   Future<void> formSubmit() async {
@@ -133,7 +143,18 @@ class LoginForm extends State<LoginPage> {
               Container(
                 alignment: Alignment.topRight,
                 child: TextButton(
-                    onPressed: _saveForm,
+                    onPressed: () {
+                      _saveForm().then(
+                        (value) {
+                          if (value) {
+                            Navigator.of(context).pushReplacementNamed("/posts");
+                          } else {
+
+                          }
+                        },
+                      );
+                      // Navigator.of(context).pushNamed("/posts");
+                    },
                     style: const ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll(
                             Color.fromRGBO(230, 138, 0, 1))),
