@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/posts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 void main() {
   // runApp(const MyApp());
@@ -58,6 +59,8 @@ class LoginForm extends State<LoginPage> {
     return _form.currentState!.validate();
   }
 
+  bool _isLoading = true;
+
   Future<void> authCheck() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -76,16 +79,19 @@ class LoginForm extends State<LoginPage> {
           "Content-Type": "application/json"
         });
 
+    setState(() {
+      _isLoading = false;
+    });
+
     if (response.statusCode == 500) {
       return;
     }
-    debugPrint(response.body);
 
     Map<String, dynamic> body = jsonDecode(response.body);
 
     if (body['isLoggedIn']) {
       Future(() {
-        Navigator.pushNamed(context, '/posts');
+        Navigator.pushReplacementNamed(context, '/posts');
         debugPrint(response.body);
       });
     }
@@ -132,95 +138,105 @@ class LoginForm extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(25),
-        // the Form here
-        child: Form(
-          key: _form,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Center(
-                child: Text("Login Page",
-                    textScaleFactor: 2,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline)),
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  // errorText: resposeMessage.containsKey("email") && resposeMessage['email'] != []
-                  //     ? resposeMessage['email'].toString()
-                  //     : null
+      body: _isLoading
+          ? const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Post Saja Lah", textScaleFactor: 2),
+                SpinKitRing(
+                  color: Colors.black,
+                )
+              ],
+            )
+          : Padding(
+              padding: const EdgeInsets.all(25),
+              // the Form here
+              child: Form(
+                key: _form,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Center(
+                      child: Text("Login Page",
+                          textScaleFactor: 2,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline)),
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        // errorText: resposeMessage.containsKey("email") && resposeMessage['email'] != []
+                        //     ? resposeMessage['email'].toString()
+                        //     : null
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      controller: emailField,
+                      validator: (value) {
+                        // Check if this field is empty
+                        if (value == null || value.isEmpty) {
+                          return 'This field is required';
+                        }
+
+                        // using regular expression
+                        if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                          return "Please enter a valid email address";
+                        }
+
+                        // the email is valid
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: const InputDecoration(labelText: 'Password'),
+                      controller: passwordField,
+                      keyboardType: TextInputType.visiblePassword,
+                      obscureText: true,
+                      validator: (value) {
+                        // Check if this field is empty
+                        if (value == null || value.isEmpty) {
+                          return 'This field is required';
+                        }
+
+                        // the email is valid
+                        return null;
+                      },
+                    ),
+                    Container(
+                      alignment: Alignment.topRight,
+                      child: TextButton(
+                          onPressed: () {
+                            _saveForm().then(
+                              (value) {
+                                if (value) {
+                                  Navigator.of(context)
+                                      .pushReplacementNamed("/posts");
+                                } else {}
+                              },
+                            );
+                            // Navigator.of(context).pushNamed("/posts");
+                          },
+                          style: const ButtonStyle(
+                              backgroundColor: MaterialStatePropertyAll(
+                                  Color.fromRGBO(230, 138, 0, 1))),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(color: Colors.black),
+                          )),
+                    ),
+                    resposeErrorMessage.containsKey("message")
+                        ? Text(
+                            resposeErrorMessage['message'],
+                            style: const TextStyle(color: Colors.red),
+                          )
+                        : Container(),
+                    resposeSuccessMessage != null
+                        ? Text(resposeSuccessMessage!)
+                        : Container()
+                  ],
                 ),
-                keyboardType: TextInputType.emailAddress,
-                controller: emailField,
-                validator: (value) {
-                  // Check if this field is empty
-                  if (value == null || value.isEmpty) {
-                    return 'This field is required';
-                  }
-
-                  // using regular expression
-                  if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
-                    return "Please enter a valid email address";
-                  }
-
-                  // the email is valid
-                  return null;
-                },
               ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Password'),
-                controller: passwordField,
-                keyboardType: TextInputType.visiblePassword,
-                obscureText: true,
-                validator: (value) {
-                  // Check if this field is empty
-                  if (value == null || value.isEmpty) {
-                    return 'This field is required';
-                  }
-
-                  // the email is valid
-                  return null;
-                },
-              ),
-              Container(
-                alignment: Alignment.topRight,
-                child: TextButton(
-                    onPressed: () {
-                      _saveForm().then(
-                        (value) {
-                          if (value) {
-                            Navigator.of(context)
-                                .pushReplacementNamed("/posts");
-                          } else {}
-                        },
-                      );
-                      // Navigator.of(context).pushNamed("/posts");
-                    },
-                    style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
-                            Color.fromRGBO(230, 138, 0, 1))),
-                    child: const Text(
-                      'Login',
-                      style: TextStyle(color: Colors.black),
-                    )),
-              ),
-              resposeErrorMessage.containsKey("message")
-                  ? Text(
-                      resposeErrorMessage['message'],
-                      style: const TextStyle(color: Colors.red),
-                    )
-                  : Container(),
-              resposeSuccessMessage != null
-                  ? Text(resposeSuccessMessage!)
-                  : Container()
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
