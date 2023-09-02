@@ -21,6 +21,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login']);
 
+Route::get('/auth/check', function() {
+    return response([
+        'isLoggedIn' => Auth::guard('sanctum')->check()
+    ]);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
     

@@ -58,6 +58,47 @@ class LoginForm extends State<LoginPage> {
     return _form.currentState!.validate();
   }
 
+  Future<void> authCheck() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String? token = prefs.getString('token');
+    debugPrint(token);
+
+    final response = await http.get(
+        Uri(
+          host: '192.168.131.28',
+          port: 8000,
+          scheme: 'http',
+          path: 'api/auth/check',
+        ),
+        headers: {
+          'Authorization': 'Bearer $token',
+          "Content-Type": "application/json"
+        });
+
+    if (response.statusCode == 500) {
+      return;
+    }
+    debugPrint(response.body);
+
+    Map<String, dynamic> body = jsonDecode(response.body);
+
+    if (body['isLoggedIn']) {
+      Future(() {
+        Navigator.pushNamed(context, '/posts');
+        debugPrint(response.body);
+      });
+    }
+
+    // return body['isLoggedIn'];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    authCheck();
+  }
+
   Future<void> formSubmit() async {
     if (_isValid) {
       var data = await http.post(Uri.http("192.168.131.28:8000", '/api/login'),

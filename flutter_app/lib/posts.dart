@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Posts extends StatefulWidget {
@@ -11,13 +14,28 @@ class Posts extends StatefulWidget {
 class PostsState extends State<Posts> {
   String? _token;
   int _counter = 0;
+  Map<String, dynamic>? _posts;
 
   Future<void> getData() async {
     final prefs = await SharedPreferences.getInstance();
 
     String? token = prefs.getString('token');
+
+    //
+    final response = await http.get(Uri(
+      host: '192.168.131.28',
+      scheme: 'http',
+      port: 8000,
+      path: '/api/posts',
+    ));
+
+    if (response.statusCode == 500) {
+      return;
+    }
+
     setState(() {
       _token = token;
+      _posts = jsonDecode(response.body);
     });
   }
 
@@ -25,8 +43,6 @@ class PostsState extends State<Posts> {
   void initState() {
     super.initState();
     getData();
-    // SharedPreferences.getInstance()
-    //     .then((value) => _token = value.getString('token'));
   }
 
   @override
