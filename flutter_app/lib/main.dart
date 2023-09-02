@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/post_show.dart';
 import 'package:flutter_app/posts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +14,7 @@ void main() {
     routes: <String, WidgetBuilder>{
       '/': (context) => const LoginPage(title: Text('posts')),
       '/posts': (context) => const Posts(title: Text('posts')),
+      // '/posts/show': (context) => const PostShow(),
     },
   ));
 }

@@ -55,13 +55,18 @@ class PostsState extends State<Posts> {
     // debugPrint(jsonEncode(_posts));
     return MaterialApp(
       theme: ThemeData(
-          cardTheme:
-              const CardTheme(shadowColor: Color.fromRGBO(230, 138, 0, 1)),
-          textTheme: const TextTheme(bodyMedium: TextStyle(fontSize: 20.0))),
+        cardTheme: const CardTheme(
+          shadowColor: Color.fromARGB(255, 255, 140, 0),
+          elevation: 5,
+          margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        ),
+        textTheme: const TextTheme(bodyMedium: TextStyle(fontSize: 20.0)),
+        appBarTheme:
+            const AppBarTheme(backgroundColor: Color.fromRGBO(230, 138, 0, 1)),
+      ),
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Post in Aja'),
-          backgroundColor: const Color.fromRGBO(230, 138, 0, 1),
         ),
         body: LayoutBuilder(
           builder: (context, constrain) {
@@ -69,47 +74,13 @@ class PostsState extends State<Posts> {
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constrain.maxHeight),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     for (var post in _posts!)
                       PostCard(
                         post: post,
                       )
-                    // Card(
-                    //   child: SizedBox(
-                    //     child: Padding(
-                    //       padding: const EdgeInsets.all(8.0),
-                    //       child: Column(
-                    //         crossAxisAlignment: CrossAxisAlignment.start,
-                    //         children: [
-                    //           Text(
-                    //             post['author'],
-                    //             style: const TextStyle(
-                    //               fontWeight: FontWeight.bold,
-                    //             ),
-                    //           ),
-                    //           Text(
-                    //             DateFormat('dd/MM/y').format(
-                    //                 DateTime.parse(post['published_date'])),
-                    //             textScaleFactor: 0.6,
-                    //             style:
-                    //                 const TextStyle(color: Color(0xFF8B8B8B)),
-                    //           ),
-                    //           Text(
-                    //             post['title'],
-                    //             style: const TextStyle(
-                    //                 fontWeight: FontWeight.bold),
-                    //           ),
-                    //           Text(post['content'],
-                    //               textScaleFactor: 0.6,
-                    //               maxLines: 2,
-                    //               overflow: TextOverflow.ellipsis),
-                    //         ],
-                    //       ),
-                    //     ),
-                    //   ),
-                    // )
                   ],
                 ),
               ),

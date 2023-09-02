@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/post_show.dart';
 import 'package:intl/intl.dart';
+import 'package:page_transition/page_transition.dart';
 
 class PostCard extends StatefulWidget {
   final Map<String, dynamic> post;
@@ -43,14 +45,32 @@ class PostCardState extends State<PostCard> {
                 textScaleFactor: 0.6,
                 style: const TextStyle(color: Color(0xFF8B8B8B)),
               ),
-              Text(
-                _post?['title'],
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              GestureDetector(
+                onTap: () {
+                  if (_post != null) {
+                    Navigator.push(
+                        context,
+                        PageTransition(
+                            child: PostShow(post: _post!),
+                            type: PageTransitionType.rightToLeft));
+                  }
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _post?['title'],
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      _post?['content'],
+                      textScaleFactor: 0.6,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-              Text(_post?['content'],
-                  textScaleFactor: 0.6,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis),
             ],
           ),
         ),
