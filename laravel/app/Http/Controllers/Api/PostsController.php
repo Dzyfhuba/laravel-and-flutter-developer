@@ -63,7 +63,12 @@ class PostsController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $post = Post::find($id);
+            return response($post);
+        } catch (\Exception $e) {
+            return response($e, 500);
+        }
     }
 
     /**

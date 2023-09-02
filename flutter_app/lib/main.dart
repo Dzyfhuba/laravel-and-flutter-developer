@@ -67,7 +67,7 @@ class LoginForm extends State<LoginPage> {
     final prefs = await SharedPreferences.getInstance();
 
     String? token = prefs.getString('token');
-    debugPrint(token);
+    debugPrint("token: $token");
 
     final response = await http.get(
         Uri(
