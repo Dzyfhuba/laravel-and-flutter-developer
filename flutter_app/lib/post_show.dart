@@ -17,6 +17,7 @@ class PostShowState extends State<PostShow> {
   Map<String, dynamic>? _post;
   String? _token;
   TextEditingController commentField = TextEditingController();
+  final _commentForm = GlobalKey<FormState>();
 
   void getData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -53,6 +54,10 @@ class PostShowState extends State<PostShow> {
     getData();
   }
 
+  Future<bool> handComment() async {
+    return true;
+  }
+
   void handleThumb(String action) async {
     var response = await http.get(
         Uri(
@@ -82,8 +87,12 @@ class PostShowState extends State<PostShow> {
         appBarTheme: const AppBarTheme(
           backgroundColor: Color.fromRGBO(230, 138, 0, 1),
         ),
-        // iconTheme: const IconThemeData(
-        //   color: Color(0xFFFF8C00),
+        // iconButtonTheme: const IconButtonThemeData(
+        //   style: ButtonStyle(
+        //     iconColor: MaterialStatePropertyAll(
+        //       Color(0xFFFF8C00),
+        //     ),
+        //   ),
         // ),
       ),
       home: Scaffold(
@@ -250,40 +259,44 @@ class PostShowState extends State<PostShow> {
                                   children: [
                                     Column(
                                       children: [
-                                        Icon(Icons.drag_handle),
-                                        Text('Comments'),
+                                        Text(
+                                          'Comments',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ],
                                     )
                                   ],
                                 ),
                                 Form(
-                                  child: Column(children: [
-                                    TextFormField(
-                                      decoration: const InputDecoration(
-                                        labelText: 'Comment Here',
-                                        // errorText: resposeMessage.containsKey("email") && resposeMessage['email'] != []
-                                        //     ? resposeMessage['email'].toString()
-                                        //     : null
+                                  key: _commentForm,
+                                  child: Column(
+                                    children: [
+                                      TextFormField(
+                                        decoration: InputDecoration(
+                                          labelText: 'Comment Here',
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              debugPrint('comment');
+                                            },
+                                            icon: const Icon(Icons.send,
+                                                color: Color(0xFFFF8C00)),
+                                          ),
+                                        ),
+                                        controller: commentField,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'This field is required';
+                                          }
+
+                                          return null;
+                                        },
                                       ),
-                                      controller: commentField,
-                                      validator: (value) {
-                                        // Check if this field is empty
-                                        if (value == null || value.isEmpty) {
-                                          return 'This field is required';
-                                        }
-
-                                        // using regular expression
-                                        if (!RegExp(r'\S+@\S+\.\S+')
-                                            .hasMatch(value)) {
-                                          return "Please enter a valid email address";
-                                        }
-
-                                        // the email is valid
-                                        return null;
-                                      },
-                                    ),
-                                  ]),
-                                )
+                                    ],
+                                  ),
+                                ),
+                                // for (int i = 0; i < 100; i++) const Text('asd')
                               ],
                             ),
                           ),
