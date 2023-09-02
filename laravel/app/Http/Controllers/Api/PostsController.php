@@ -25,7 +25,7 @@ class PostsController extends Controller
         if ($request->query('date'))
             $posts->whereDate('published_date', $request->query('date'));
 
-        return response($posts->get());
+        return response($posts->where('status', true)->get());
     }
 
     /**
