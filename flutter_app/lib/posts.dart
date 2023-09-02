@@ -18,7 +18,7 @@ class PostsState extends State<Posts> {
   int _counter = 0;
   List<dynamic>? _posts = [];
 
-  Future<void> getData() async {
+  Future<List<dynamic>> getData() async {
     final prefs = await SharedPreferences.getInstance();
 
     String? token = prefs.getString('token');
@@ -35,13 +35,15 @@ class PostsState extends State<Posts> {
     debugPrint(response.body);
 
     if (response.statusCode == 500) {
-      return;
+      return [];
     }
 
     setState(() {
       _token = token;
       _posts = jsonDecode(response.body);
     });
+
+    return jsonDecode(response.body);
   }
 
   @override
@@ -68,24 +70,37 @@ class PostsState extends State<Posts> {
         appBar: AppBar(
           title: const Text('Post in Aja'),
         ),
-        body: LayoutBuilder(
-          builder: (context, constrain) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constrain.maxHeight),
-                child: Column(
-                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (var post in _posts!)
-                      PostCard(
-                        post: post,
-                      )
-                  ],
-                ),
-              ),
-            );
+        body: RefreshIndicator(
+          onRefresh: () async {
+            var data = await getData();
+            setState(() {
+              _posts = [];
+            });
+            Future.delayed(const Duration(milliseconds: 100), () {
+              setState(() {
+                _posts = data;
+              });
+            });
           },
+          child: LayoutBuilder(
+            builder: (context, constrain) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constrain.maxHeight),
+                  child: Column(
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (var post in _posts!)
+                        PostCard(
+                          post: post,
+                        )
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
