@@ -16,6 +16,7 @@ class PostShow extends StatefulWidget {
 class PostShowState extends State<PostShow> {
   Map<String, dynamic>? _post;
   String? _token;
+  TextEditingController commentField = TextEditingController();
 
   void getData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -136,7 +137,6 @@ class PostShowState extends State<PostShow> {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constrain.maxHeight),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Card(
@@ -233,6 +233,56 @@ class PostShowState extends State<PostShow> {
                                       ),
                                     )
                                   ],
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Card(
+                        child: SizedBox(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                const ButtonBar(
+                                  alignment: MainAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Icon(Icons.drag_handle),
+                                        Text('Comments'),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                Form(
+                                  child: Column(children: [
+                                    TextFormField(
+                                      decoration: const InputDecoration(
+                                        labelText: 'Comment Here',
+                                        // errorText: resposeMessage.containsKey("email") && resposeMessage['email'] != []
+                                        //     ? resposeMessage['email'].toString()
+                                        //     : null
+                                      ),
+                                      controller: commentField,
+                                      validator: (value) {
+                                        // Check if this field is empty
+                                        if (value == null || value.isEmpty) {
+                                          return 'This field is required';
+                                        }
+
+                                        // using regular expression
+                                        if (!RegExp(r'\S+@\S+\.\S+')
+                                            .hasMatch(value)) {
+                                          return "Please enter a valid email address";
+                                        }
+
+                                        // the email is valid
+                                        return null;
+                                      },
+                                    ),
+                                  ]),
                                 )
                               ],
                             ),

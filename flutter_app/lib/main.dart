@@ -159,11 +159,13 @@ class LoginForm extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Center(
-                      child: Text("Login Page",
-                          textScaleFactor: 2,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline)),
+                      child: Text(
+                        "Login Page",
+                        textScaleFactor: 2,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline),
+                      ),
                     ),
                     TextFormField(
                       decoration: const InputDecoration(
