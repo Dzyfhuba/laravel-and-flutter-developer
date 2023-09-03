@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:popover/popover.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CommentCard extends StatefulWidget {
@@ -93,14 +94,13 @@ class CommentCardState extends State<CommentCard> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.edit, size: 18),
-                  onPressed: () {
+                OpsiButton(
+                  onEditPress: () {
                     setState(() {
-                      commentField.text = _comment?['comment'];
-                      _enableEdit = !_enableEdit;
+                      _enableEdit = true;
                     });
                   },
+                  onDeletePress: () {},
                 )
               ],
             ),
@@ -155,5 +155,66 @@ class CommentCardState extends State<CommentCard> {
         ),
       ),
     );
+  }
+}
+
+class OpsiButton extends StatelessWidget {
+  final void Function() onEditPress;
+  final void Function() onDeletePress;
+  const OpsiButton({
+    super.key,
+    required this.onEditPress,
+    required this.onDeletePress,
+  });
+
+  // var _popoverKey
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton(
+      itemBuilder: (context) => <PopupMenuEntry>[
+        const PopupMenuItem(
+          value: 'edit',
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [Icon(Icons.edit, size: 18), Text('Edit')],
+          ),
+        )
+      ],
+    );
+    // return
+    //     // decoration: const BoxDecoration(
+    //     //   color: Colors.white,
+    //     //   borderRadius: BorderRadius.all(Radius.circular(5)),
+    //     //   boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5)],
+    //     // ),
+    //     GestureDetector(
+    //   child: const Center(child: Icon(Icons.more_vert)),
+    //   onTap: () {
+    //     showPopover(
+    //       context: context,
+    //       bodyBuilder: (context) => Column(
+    //         children: [
+    //           IconButton(
+    //             icon: const Icon(Icons.edit, size: 18),
+    //             onPressed: () {
+    //               onEditPress();
+    //             },
+    //           ),
+    //           IconButton(
+    //             icon: const Icon(Icons.delete, size: 18),
+    //             onPressed: () {},
+    //           )
+    //         ],
+    //       ),
+    //       onPop: () => debugPrint('Popover was popped!'),
+    //       direction: PopoverDirection.top,
+    //       width: 50,
+    //       height: 100,
+    //       arrowHeight: 15,
+    //       arrowWidth: 30,
+    //     );
+    //   },
+    // );
   }
 }
