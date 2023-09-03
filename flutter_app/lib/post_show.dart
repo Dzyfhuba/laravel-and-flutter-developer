@@ -88,7 +88,7 @@ class PostShowState extends State<PostShow> {
         body: jsonEncode({'comment': commentField.text}),
         headers: {
           'Authorization': 'Bearer $token',
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         });
     debugPrint('/api/posts/${_post?["id"]}/comments');
     debugPrint(response.body.toString());
@@ -183,7 +183,15 @@ class PostShowState extends State<PostShow> {
         // ),
         body: RefreshIndicator(
           onRefresh: () async {
-            getData();
+            setState(() {
+              _comments = [];
+            });
+            Future.delayed(
+              const Duration(microseconds: 100),
+              () {
+                getData();
+              },
+            );
           },
           child: LayoutBuilder(
             builder: (context, constrain) {
