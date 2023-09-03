@@ -54,8 +54,38 @@ class PostShowState extends State<PostShow> {
     getData();
   }
 
-  Future<bool> handComment() async {
-    return true;
+  Future<bool> handleComment() async {
+    if (!_commentForm.currentState!.validate()) {
+      return false;
+    }
+    final prefs = await SharedPreferences.getInstance();
+
+    String? token = prefs.getString('token');
+
+    var response = await http.post(
+        Uri(
+          host: '192.168.131.28',
+          port: 8000,
+          scheme: 'http',
+          path: '/api/posts/${_post?["id"]}/comments',
+        ),
+        body: jsonEncode({'comment': commentField.text}),
+        headers: {
+          'Authorization': 'Bearer $token',
+          "Content-Type": "application/json"
+        });
+    debugPrint('/api/posts/${_post?["id"]}/comments');
+    debugPrint(response.body.toString());
+    if (response.statusCode == 500) {
+      return false;
+    }
+    if (response.statusCode == 201) {
+      commentField.clear();
+      getData();
+      return true;
+    }
+
+    return false;
   }
 
   void handleThumb(String action) async {
@@ -274,11 +304,16 @@ class PostShowState extends State<PostShow> {
                                   child: Column(
                                     children: [
                                       TextFormField(
+                                        onEditingComplete: () {
+                                          debugPrint('comment');
+                                          handleComment();
+                                        },
                                         decoration: InputDecoration(
                                           labelText: 'Comment Here',
                                           suffixIcon: IconButton(
                                             onPressed: () {
                                               debugPrint('comment');
+                                              handleComment();
                                             },
                                             icon: const Icon(Icons.send,
                                                 color: Color(0xFFFF8C00)),

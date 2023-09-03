@@ -51,7 +51,7 @@ class PostCommentsController extends Controller
             return response([
                 'message' => 'comment created',
                 'comment' => $comment
-            ]);
+            ], 201);
         } catch (\Exception $e) {
             return response($e->getMessage(), $e->getCode());
         }
@@ -84,7 +84,7 @@ class PostCommentsController extends Controller
             return response([
                 'message' => 'comment updated',
                 'comment' => $comment
-            ]);
+            ], 201);
         } catch (\Exception $e) {
             return response($e->getMessage(), $e->getCode());
         }

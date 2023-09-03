@@ -49,6 +49,8 @@ class LoginForm extends State<LoginPage> {
     // "password": [],
   };
   String? resposeSuccessMessage;
+  bool _isNetworkError = false;
+
   Future<bool> _saveForm() async {
     setState(() {
       _isValid = _form.currentState!.validate();
@@ -70,16 +72,23 @@ class LoginForm extends State<LoginPage> {
     debugPrint("token: $token");
 
     final response = await http.get(
-        Uri(
-          host: '192.168.131.28',
-          port: 8000,
-          scheme: 'http',
-          path: 'api/auth/check',
-        ),
-        headers: {
-          'Authorization': 'Bearer $token',
-          "Content-Type": "application/json"
-        });
+      Uri(
+        host: '192.168.131.28',
+        port: 8000,
+        scheme: 'http',
+        path: 'api/auth/check',
+      ),
+      headers: {
+        'Authorization': 'Bearer $token',
+        "Content-Type": "application/json"
+      },
+    ).catchError((err) async {
+      setState(() {
+        _isLoading = false;
+        _isNetworkError = true;
+      });
+      return err;
+    });
 
     setState(() {
       _isLoading = false;
@@ -109,12 +118,16 @@ class LoginForm extends State<LoginPage> {
 
   Future<void> formSubmit() async {
     if (_isValid) {
-      var data = await http.post(Uri.http("192.168.131.28:8000", '/api/login'),
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode({
+      var data = await http.post(
+        Uri.http("192.168.131.28:8000", '/api/login'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(
+          {
             'email': emailField.text,
             'password': passwordField.text,
-          }));
+          },
+        ),
+      );
 
       final Map<String, dynamic> body = jsonDecode(data.body);
 
@@ -150,97 +163,111 @@ class LoginForm extends State<LoginPage> {
                 )
               ],
             )
-          : Padding(
-              padding: const EdgeInsets.all(25),
-              // the Form here
-              child: Form(
-                key: _form,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Center(
-                      child: Text(
-                        "Login Page",
-                        textScaleFactor: 2,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline),
-                      ),
-                    ),
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        // errorText: resposeMessage.containsKey("email") && resposeMessage['email'] != []
-                        //     ? resposeMessage['email'].toString()
-                        //     : null
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      controller: emailField,
-                      validator: (value) {
-                        // Check if this field is empty
-                        if (value == null || value.isEmpty) {
-                          return 'This field is required';
-                        }
+          : _isNetworkError
+              ? const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Network Error',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                          textScaleFactor: 2),
+                      Text('Check Your Connection'),
+                      Text('If not that, let us know'),
+                    ],
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(25),
+                  // the Form here
+                  child: Form(
+                    key: _form,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Center(
+                          child: Text(
+                            "Login Page",
+                            textScaleFactor: 2,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline),
+                          ),
+                        ),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Email',
+                            // errorText: resposeMessage.containsKey("email") && resposeMessage['email'] != []
+                            //     ? resposeMessage['email'].toString()
+                            //     : null
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          controller: emailField,
+                          validator: (value) {
+                            // Check if this field is empty
+                            if (value == null || value.isEmpty) {
+                              return 'This field is required';
+                            }
 
-                        // using regular expression
-                        if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
-                          return "Please enter a valid email address";
-                        }
+                            // using regular expression
+                            if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                              return "Please enter a valid email address";
+                            }
 
-                        // the email is valid
-                        return null;
-                      },
-                    ),
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: 'Password'),
-                      controller: passwordField,
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: true,
-                      validator: (value) {
-                        // Check if this field is empty
-                        if (value == null || value.isEmpty) {
-                          return 'This field is required';
-                        }
-
-                        // the email is valid
-                        return null;
-                      },
-                    ),
-                    Container(
-                      alignment: Alignment.topRight,
-                      child: TextButton(
-                          onPressed: () {
-                            _saveForm().then(
-                              (value) {
-                                if (value) {
-                                  Navigator.of(context)
-                                      .pushReplacementNamed("/posts");
-                                } else {}
-                              },
-                            );
-                            // Navigator.of(context).pushNamed("/posts");
+                            // the email is valid
+                            return null;
                           },
-                          style: const ButtonStyle(
-                              backgroundColor: MaterialStatePropertyAll(
-                                  Color.fromRGBO(230, 138, 0, 1))),
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(color: Colors.black),
-                          )),
+                        ),
+                        TextFormField(
+                          decoration:
+                              const InputDecoration(labelText: 'Password'),
+                          controller: passwordField,
+                          keyboardType: TextInputType.visiblePassword,
+                          obscureText: true,
+                          validator: (value) {
+                            // Check if this field is empty
+                            if (value == null || value.isEmpty) {
+                              return 'This field is required';
+                            }
+
+                            // the email is valid
+                            return null;
+                          },
+                        ),
+                        Container(
+                          alignment: Alignment.topRight,
+                          child: TextButton(
+                              onPressed: () {
+                                _saveForm().then(
+                                  (value) {
+                                    if (value) {
+                                      Navigator.of(context)
+                                          .pushReplacementNamed("/posts");
+                                    } else {}
+                                  },
+                                );
+                                // Navigator.of(context).pushNamed("/posts");
+                              },
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Color.fromRGBO(230, 138, 0, 1))),
+                              child: const Text(
+                                'Login',
+                                style: TextStyle(color: Colors.black),
+                              )),
+                        ),
+                        resposeErrorMessage.containsKey("message")
+                            ? Text(
+                                resposeErrorMessage['message'],
+                                style: const TextStyle(color: Colors.red),
+                              )
+                            : Container(),
+                        resposeSuccessMessage != null
+                            ? Text(resposeSuccessMessage!)
+                            : Container()
+                      ],
                     ),
-                    resposeErrorMessage.containsKey("message")
-                        ? Text(
-                            resposeErrorMessage['message'],
-                            style: const TextStyle(color: Colors.red),
-                          )
-                        : Container(),
-                    resposeSuccessMessage != null
-                        ? Text(resposeSuccessMessage!)
-                        : Container()
-                  ],
+                  ),
                 ),
-              ),
-            ),
     );
   }
 }
