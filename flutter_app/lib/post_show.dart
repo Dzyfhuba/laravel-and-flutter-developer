@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/comment_card.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -352,53 +353,7 @@ class PostShowState extends State<PostShow> {
                                 Column(
                                   children: [
                                     for (var comment in _comments)
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: const Color(0xFFFF8C00)),
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(8)),
-                                        ),
-                                        margin: const EdgeInsets.symmetric(
-                                            vertical: 8),
-                                        alignment: Alignment.topLeft,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                comment['name'] ?? '',
-                                                textScaleFactor: 0.8,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Text(
-                                                comment['comment'] ?? '',
-                                                textScaleFactor: 0.8,
-                                              ),
-                                              Container(
-                                                alignment: Alignment.topRight,
-                                                child: Text(
-                                                  DateFormat('dd/MM/y').format(
-                                                    DateTime.parse(
-                                                      _post?['published_date'] ??
-                                                          DateTime.now()
-                                                              .toString(),
-                                                    ),
-                                                  ),
-                                                  textScaleFactor: 0.5,
-                                                  style: const TextStyle(
-                                                    color: Color(0xFF8B8B8B),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
+                                      CommentCard(comment: comment)
                                   ],
                                 )
                               ],
