@@ -22,8 +22,9 @@ class PostCommentsController extends Controller
                 'comments.id',
                 'users.name',
                 'comments.comment',
-                'comments.updated_at',
+                'comments.created_at',
             )
+            ->orderBy('comments.created_at', 'desc')
             ->get();
 
         return response($comments);

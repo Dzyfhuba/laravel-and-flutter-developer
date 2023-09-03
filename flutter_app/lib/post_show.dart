@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PostShow extends StatefulWidget {
@@ -18,6 +18,7 @@ class PostShowState extends State<PostShow> {
   String? _token;
   TextEditingController commentField = TextEditingController();
   final _commentForm = GlobalKey<FormState>();
+  List<dynamic> _comments = [];
 
   void getData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -33,11 +34,25 @@ class PostShowState extends State<PostShow> {
       ),
       headers: {'Authorization': 'Bearer $token'},
     );
-    debugPrint('/api/posts/${_post?["id"]}');
-    debugPrint(_token);
+    // debugPrint('/api/posts/${_post?["id"]}');
+    // debugPrint(_token);
+
+    var responseComment = await http.get(
+      Uri(
+        host: '192.168.131.28',
+        scheme: 'http',
+        port: 8000,
+        path: '/api/posts/${widget.post["id"]}/comments',
+      ),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    debugPrint(responseComment.body);
+
     setState(() {
       _post = jsonDecode(response.body);
       _token = token;
+      _comments = jsonDecode(responseComment.body);
     });
 
     // setState(() {
@@ -191,9 +206,12 @@ class PostShowState extends State<PostShow> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  DateFormat('dd/MM/y').format(DateTime.parse(
+                                  DateFormat('dd/MM/y').format(
+                                    DateTime.parse(
                                       _post?['published_date'] ??
-                                          DateTime.now().toString())),
+                                          DateTime.now().toString(),
+                                    ),
+                                  ),
                                   textScaleFactor: 0.6,
                                   style:
                                       const TextStyle(color: Color(0xFF8B8B8B)),
@@ -331,7 +349,58 @@ class PostShowState extends State<PostShow> {
                                     ],
                                   ),
                                 ),
-                                // for (int i = 0; i < 100; i++) const Text('asd')
+                                Column(
+                                  children: [
+                                    for (var comment in _comments)
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: const Color(0xFFFF8C00)),
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(8)),
+                                        ),
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 8),
+                                        alignment: Alignment.topLeft,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                comment['name'] ?? '',
+                                                textScaleFactor: 0.8,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(
+                                                comment['comment'] ?? '',
+                                                textScaleFactor: 0.8,
+                                              ),
+                                              Container(
+                                                alignment: Alignment.topRight,
+                                                child: Text(
+                                                  DateFormat('dd/MM/y').format(
+                                                    DateTime.parse(
+                                                      _post?['published_date'] ??
+                                                          DateTime.now()
+                                                              .toString(),
+                                                    ),
+                                                  ),
+                                                  textScaleFactor: 0.5,
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF8B8B8B),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                  ],
+                                )
                               ],
                             ),
                           ),
