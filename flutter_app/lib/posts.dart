@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/nav_bar.dart';
 import 'package:flutter_app/post_card.dart';
+import 'package:flutter_app/profile.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,7 +17,7 @@ class Posts extends StatefulWidget {
 
 class PostsState extends State<Posts> {
   String? _token;
-  int _counter = 0;
+  int _pageIndex = 0;
   List<dynamic>? _posts = [];
 
   Future<List<dynamic>> getData() async {
@@ -58,7 +60,7 @@ class PostsState extends State<Posts> {
     return MaterialApp(
       theme: ThemeData(
         cardTheme: const CardTheme(
-          shadowColor: Color.fromARGB(255, 255, 140, 0),
+          shadowColor: Color(0xFFFF8C00),
           elevation: 5,
           margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         ),
@@ -70,38 +72,49 @@ class PostsState extends State<Posts> {
         appBar: AppBar(
           title: const Text('Post in Aja'),
         ),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            var data = await getData();
+        bottomNavigationBar: NavBar(
+          setPageIndex: (index) {
             setState(() {
-              _posts = [];
-            });
-            Future.delayed(const Duration(milliseconds: 100), () {
-              setState(() {
-                _posts = data;
-              });
+              _pageIndex = index;
             });
           },
-          child: LayoutBuilder(
-            builder: (context, constrain) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constrain.maxHeight),
-                  child: Column(
-                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      for (var post in _posts!)
-                        PostCard(
-                          post: post,
-                        )
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
         ),
+        body: [
+          RefreshIndicator(
+            onRefresh: () async {
+              var data = await getData();
+              setState(() {
+                _posts = [];
+              });
+              Future.delayed(const Duration(milliseconds: 100), () {
+                setState(() {
+                  _posts = data;
+                });
+              });
+            },
+            child: LayoutBuilder(
+              builder: (context, constrain) {
+                return SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constrain.maxHeight),
+                    child: Column(
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (var post in _posts!)
+                          PostCard(
+                            post: post,
+                          )
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const Profile()
+        ][_pageIndex],
       ),
     );
   }
