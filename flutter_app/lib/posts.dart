@@ -16,7 +16,7 @@ class Posts extends StatefulWidget {
 }
 
 class PostsState extends State<Posts> {
-  String? _token;
+  // String? _token;
   int _pageIndex = 0;
   List<dynamic>? _posts = [];
 
@@ -41,7 +41,7 @@ class PostsState extends State<Posts> {
     }
 
     setState(() {
-      _token = token;
+      // _token = token;
       _posts = jsonDecode(response.body);
     });
 
