@@ -56,7 +56,7 @@ class LoginForm extends State<LoginPage> {
       _isValid = _form.currentState!.validate();
     });
     if (_form.currentState!.validate()) {
-      await formSubmit();
+      return await formSubmit();
       // debugPrint(emailField.text);
       // debugPrint(passwordField.text);
     }
@@ -116,7 +116,7 @@ class LoginForm extends State<LoginPage> {
     authCheck();
   }
 
-  Future<void> formSubmit() async {
+  Future<bool> formSubmit() async {
     if (_isValid) {
       var data = await http.post(
         Uri.http("192.168.131.28:8000", '/api/login'),
@@ -146,8 +146,12 @@ class LoginForm extends State<LoginPage> {
         final prefs = await SharedPreferences.getInstance();
 
         await prefs.setString('token', body['token']);
+        await prefs.setString('user', jsonEncode(body['user']));
+        return true;
       }
+      return false;
     }
+    return false;
   }
 
   @override

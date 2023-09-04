@@ -71,6 +71,8 @@ class CommentCardState extends State<CommentCard> {
     return response.statusCode == 201;
   }
 
+  void handleThumb(String action) async {}
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -95,33 +97,35 @@ class CommentCardState extends State<CommentCard> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                OpsiButton(
-                  isEditable: _enableEdit,
-                  onEditPress: () {
-                    setState(() {
-                      _enableEdit = !_enableEdit;
-                    });
-                  },
-                  onDeletePress: () async {
-                    var response = await http.delete(
-                      Uri(
-                        host: '192.168.131.28',
-                        port: 8000,
-                        scheme: 'http',
-                        path: '/api/posts/comments/${_comment?["id"]}',
-                      ),
-                      headers: {'Authorization': 'Bearer $_token'},
-                    );
+                (false)
+                    ? Container()
+                    : OpsiButton(
+                        isEditable: _enableEdit,
+                        onEditPress: () {
+                          setState(() {
+                            _enableEdit = !_enableEdit;
+                          });
+                        },
+                        onDeletePress: () async {
+                          var response = await http.delete(
+                            Uri(
+                              host: '192.168.131.28',
+                              port: 8000,
+                              scheme: 'http',
+                              path: '/api/posts/comments/${_comment?["id"]}',
+                            ),
+                            headers: {'Authorization': 'Bearer $_token'},
+                          );
 
-                    if (response.statusCode != 200) {
-                      return;
-                    }
+                          if (response.statusCode != 200) {
+                            return;
+                          }
 
-                    widget.onRefresh();
-                    // if (_comment != null) {
-                    // }
-                  },
-                )
+                          widget.onRefresh();
+                          // if (_comment != null) {
+                          // }
+                        },
+                      )
               ],
             ),
             Container(
@@ -156,6 +160,79 @@ class CommentCardState extends State<CommentCard> {
                       _comment?['comment'] ?? '',
                       textScaleFactor: 0.8,
                     ),
+            ),
+            Row(
+              children: [
+                TextButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all(
+                      const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(18),
+                          bottomLeft: Radius.circular(18),
+                        ),
+                        side: BorderSide(
+                          color: Colors.red,
+                          strokeAlign: 0,
+                        ),
+                      ),
+                    ),
+                  ),
+                  onPressed: () async {
+                    handleThumb('like');
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.thumb_up_rounded,
+                        color: Color(0xFFFF8C00),
+                        size: 16,
+                      ),
+                      // Text(
+                      //   (_post?['likes'] ?? '').toString(),
+                      //   style: const TextStyle(
+                      //     color: Color(0xFFFF8C00),
+                      //   ),
+                      // )
+                    ],
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    handleThumb('dislike');
+                  },
+                  style: ButtonStyle(
+                    // fixedSize: const MaterialStatePropertyAll(Size(4, 18)),
+                    shape: MaterialStateProperty.all(
+                      const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(18),
+                          bottomRight: Radius.circular(18),
+                        ),
+                        side: BorderSide(
+                          color: Colors.red,
+                          strokeAlign: 0,
+                        ),
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.thumb_down_rounded,
+                        color: Color(0xFFFF8C00),
+                        size: 16,
+                      ),
+                      // Text(
+                      //   (_post?['dislikes'] ?? '').toString(),
+                      //   style: const TextStyle(
+                      //     color: Color(0xFFFF8C00),
+                      //   ),
+                      // )
+                    ],
+                  ),
+                )
+              ],
             ),
             Container(
               alignment: Alignment.topRight,
@@ -229,39 +306,5 @@ class OpsiButton extends StatelessWidget {
               ),
             ],
     );
-    // return
-    //     // decoration: const BoxDecoration(
-    //     //   color: Colors.white,
-    //     //   borderRadius: BorderRadius.all(Radius.circular(5)),
-    //     //   boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5)],
-    //     // ),
-    //     GestureDetector(
-    //   child: const Center(child: Icon(Icons.more_vert)),
-    //   onTap: () {
-    //     showPopover(
-    //       context: context,
-    //       bodyBuilder: (context) => Column(
-    //         children: [
-    //           IconButton(
-    //             icon: const Icon(Icons.edit, size: 18),
-    //             onPressed: () {
-    //               onEditPress();
-    //             },
-    //           ),
-    //           IconButton(
-    //             icon: const Icon(Icons.delete, size: 18),
-    //             onPressed: () {},
-    //           )
-    //         ],
-    //       ),
-    //       onPop: () => debugPrint('Popover was popped!'),
-    //       direction: PopoverDirection.top,
-    //       width: 50,
-    //       height: 100,
-    //       arrowHeight: 15,
-    //       arrowWidth: 30,
-    //     );
-    //   },
-    // );
   }
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/nav_bar.dart';
 import 'package:flutter_app/post_card.dart';
+import 'package:flutter_app/post_create.dart';
 import 'package:flutter_app/profile.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -64,13 +65,22 @@ class PostsState extends State<Posts> {
           elevation: 5,
           margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         ),
-        textTheme: const TextTheme(bodyMedium: TextStyle(fontSize: 20.0)),
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(
+            fontSize: 20.0,
+            // color: Colors.black,
+          ),
+        ),
         appBarTheme:
             const AppBarTheme(backgroundColor: Color.fromRGBO(230, 138, 0, 1)),
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Post in Aja'),
+          title: [
+            const Text('Post in Aja'),
+            const Text('New Post'),
+            const Text('Profile'),
+          ][_pageIndex],
         ),
         bottomNavigationBar: NavBar(
           setPageIndex: (index) {
@@ -113,6 +123,7 @@ class PostsState extends State<Posts> {
               },
             ),
           ),
+          const PostCreate(),
           const Profile()
         ][_pageIndex],
       ),

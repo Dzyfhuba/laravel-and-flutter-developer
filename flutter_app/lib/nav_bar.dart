@@ -28,10 +28,17 @@ class _NavBarState extends State<NavBar> {
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Home',
+          tooltip: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.add),
+          label: 'New Post',
+          tooltip: 'New Post',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
-          label: 'School',
+          label: 'Profile',
+          tooltip: 'Profile',
         ),
       ],
     );
