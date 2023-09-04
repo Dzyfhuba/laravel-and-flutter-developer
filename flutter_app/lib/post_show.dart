@@ -97,7 +97,15 @@ class PostShowState extends State<PostShow> {
     }
     if (response.statusCode == 201) {
       commentField.clear();
-      getData();
+      setState(() {
+        _comments = [];
+      });
+      Future.delayed(
+        const Duration(milliseconds: 100),
+        () {
+          getData();
+        },
+      );
       return true;
     }
 
@@ -154,33 +162,6 @@ class PostShowState extends State<PostShow> {
                   color: Color(0xffffffff),
                   size: 44,
                 ))),
-        // body: RefreshIndicator(
-        //   onRefresh: () async {
-        //     // var data = await getData();
-        //     // setState(() {
-        //     //   _posts = [];
-        //     // });
-        //     // Future.delayed(const Duration(milliseconds: 100), () {
-        //     //   setState(() {
-        //     //     _posts = data;
-        //     //   });
-        //     // });
-        //   },
-        //   child: LayoutBuilder(
-        //     builder: (context, constrain) {
-        //       return SingleChildScrollView(
-        //         child: ConstrainedBox(
-        //           constraints: BoxConstraints(minHeight: constrain.maxHeight),
-        //           child: Column(
-        //             // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //             crossAxisAlignment: CrossAxisAlignment.stretch,
-        //             children: [for (int i = 0; i < 100; i++) const Text('asd')],
-        //           ),
-        //         ),
-        //       );
-        //     },
-        //   ),
-        // ),
         body: RefreshIndicator(
           onRefresh: () async {
             setState(() {
@@ -361,7 +342,20 @@ class PostShowState extends State<PostShow> {
                                 Column(
                                   children: [
                                     for (var comment in _comments)
-                                      CommentCard(comment: comment)
+                                      CommentCard(
+                                        comment: comment,
+                                        onRefresh: () {
+                                          setState(() {
+                                            _comments = [];
+                                          });
+                                          Future.delayed(
+                                            const Duration(milliseconds: 100),
+                                            () {
+                                              getData();
+                                            },
+                                          );
+                                        },
+                                      )
                                   ],
                                 )
                               ],

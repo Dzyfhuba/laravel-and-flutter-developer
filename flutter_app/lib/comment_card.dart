@@ -1,15 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:popover/popover.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CommentCard extends StatefulWidget {
   final Map<String, dynamic> comment;
+  final void Function() onRefresh;
 
-  const CommentCard({Key? key, required this.comment}) : super(key: key);
+  const CommentCard({Key? key, required this.comment, required this.onRefresh})
+      : super(key: key);
 
   @override
   CommentCardState createState() => CommentCardState();
@@ -95,12 +96,31 @@ class CommentCardState extends State<CommentCard> {
                   ),
                 ),
                 OpsiButton(
+                  isEditable: _enableEdit,
                   onEditPress: () {
                     setState(() {
-                      _enableEdit = true;
+                      _enableEdit = !_enableEdit;
                     });
                   },
-                  onDeletePress: () {},
+                  onDeletePress: () async {
+                    var response = await http.delete(
+                      Uri(
+                        host: '192.168.131.28',
+                        port: 8000,
+                        scheme: 'http',
+                        path: '/api/posts/comments/${_comment?["id"]}',
+                      ),
+                      headers: {'Authorization': 'Bearer $_token'},
+                    );
+
+                    if (response.statusCode != 200) {
+                      return;
+                    }
+
+                    widget.onRefresh();
+                    // if (_comment != null) {
+                    // }
+                  },
                 )
               ],
             ),
@@ -161,10 +181,13 @@ class CommentCardState extends State<CommentCard> {
 class OpsiButton extends StatelessWidget {
   final void Function() onEditPress;
   final void Function() onDeletePress;
+  final bool isEditable;
+
   const OpsiButton({
     super.key,
     required this.onEditPress,
     required this.onDeletePress,
+    required this.isEditable,
   });
 
   // var _popoverKey
@@ -172,15 +195,39 @@ class OpsiButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
-      itemBuilder: (context) => <PopupMenuEntry>[
-        const PopupMenuItem(
-          value: 'edit',
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Icon(Icons.edit, size: 18), Text('Edit')],
-          ),
-        )
-      ],
+      onSelected: (value) {
+        if (value == 'edit' || value == 'closeEdit') {
+          onEditPress();
+        } else if (value == 'delete') {
+          onDeletePress();
+        }
+      },
+      itemBuilder: (context) => isEditable
+          ? <PopupMenuEntry>[
+              const PopupMenuItem(
+                value: 'closeEdit',
+                child: Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [Icon(Icons.cancel, size: 18), Text('close')],
+                ),
+              )
+            ]
+          : <PopupMenuEntry>[
+              const PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [Icon(Icons.edit, size: 18), Text('Edit')],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [Icon(Icons.delete, size: 18), Text('Delete')],
+                ),
+              ),
+            ],
     );
     // return
     //     // decoration: const BoxDecoration(
