@@ -83,6 +83,7 @@ class PostsState extends State<Posts> {
           ][_pageIndex],
         ),
         bottomNavigationBar: NavBar(
+          pageIndex: _pageIndex,
           setPageIndex: (index) {
             setState(() {
               _pageIndex = index;
@@ -123,7 +124,18 @@ class PostsState extends State<Posts> {
               },
             ),
           ),
-          const PostCreate(),
+          PostCreate(onCreate: () async {
+            var data = await getData();
+            setState(() {
+              _posts = [];
+              _pageIndex = 0;
+            });
+            Future.delayed(const Duration(milliseconds: 100), () {
+              setState(() {
+                _posts = data;
+              });
+            });
+          }),
           const Profile()
         ][_pageIndex],
       ),

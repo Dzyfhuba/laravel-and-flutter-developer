@@ -41,6 +41,7 @@ dependencies:
   intl: ^0.18.1
   page_transition: ^2.0.9
   flutter_quill: ^7.4.4
+  html_editor_enhanced: ^2.5.1
 
 dev_dependencies:
   flutter_test:

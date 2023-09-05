@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 class NavBar extends StatefulWidget {
   final void Function(int index) setPageIndex;
-  const NavBar({super.key, required this.setPageIndex});
+  final int pageIndex;
+  const NavBar({
+    super.key,
+    required this.setPageIndex,
+    required this.pageIndex,
+  });
 
   @override
   State<NavBar> createState() => _NavBarState();
@@ -10,6 +15,14 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   int currentPageIndex = 0;
+
+  @override
+  void didUpdateWidget(State) {
+    super.didUpdateWidget(State);
+    setState(() {
+      currentPageIndex = widget.pageIndex;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
