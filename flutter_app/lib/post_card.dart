@@ -63,7 +63,11 @@ class PostCardState extends State<PostCard> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      _post?['content'],
+                      _post!['content'].toString().replaceAll(
+                            RegExp(r"<[^>]*>",
+                                multiLine: true, caseSensitive: true),
+                            ' ',
+                          ),
                       textScaleFactor: 0.6,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
