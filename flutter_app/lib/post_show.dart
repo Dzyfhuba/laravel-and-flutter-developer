@@ -1,9 +1,13 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/comment_card.dart';
+import 'package:flutter_app/posts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PostShow extends StatefulWidget {
@@ -228,44 +232,37 @@ class PostShowState extends State<PostShow> {
         ),
       ),
       home: Scaffold(
-        // floatingActionButton: _isEditable
-        //     ? FloatingActionButton(
-        //         backgroundColor: const Color(0xFFE68A00),
-        //         onPressed: () {
-        //           submitPost();
-        //         },
-        //         child: const Icon(Icons.save),
-        //       )
-        //     : null,
         appBar: AppBar(
-            title: _isEditable
-                ? TextFormField(
-                    controller: _titleField,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'This field is required';
-                      }
-                      if (value.length < 5) {
-                        return 'This field must be more than 4 characters';
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(
-                      hintText: 'Type content here..',
-                    ),
-                  )
-                : Text(_post?['title'] ?? ''),
-            leading: TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                // child: const Text('datasda',
-                //     style: TextStyle(color: Color(0xFFFFFFFF))),
-                child: const Icon(
-                  Icons.chevron_left_rounded,
-                  color: Color(0xffffffff),
-                  size: 44,
-                ))),
+          title: _isEditable
+              ? TextFormField(
+                  controller: _titleField,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'This field is required';
+                    }
+                    if (value.length < 5) {
+                      return 'This field must be more than 4 characters';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    hintText: 'Type content here..',
+                  ),
+                )
+              : Text(_post?['title'] ?? ''),
+          leading: TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            // child: const Text('datasda',
+            //     style: TextStyle(color: Color(0xFFFFFFFF))),
+            child: const Icon(
+              Icons.chevron_left_rounded,
+              color: Color(0xffffffff),
+              size: 44,
+            ),
+          ),
+        ),
         body: RefreshIndicator(
           onRefresh: () async {
             setState(() {
@@ -305,13 +302,40 @@ class PostShowState extends State<PostShow> {
                                     ),
                                     _user?['name'] == _post?['author']
                                         ? PopupMenuButton(
-                                            onSelected: (value) {
+                                            onSelected: (value) async {
                                               if (value == 'edit') {
                                                 setState(() {
                                                   _isEditable = true;
                                                 });
                                               } else if (value == 'delete') {
-                                                debugPrint('delete');
+                                                var response =
+                                                    await http.delete(
+                                                  Uri(
+                                                    host: '192.168.131.28',
+                                                    port: 8000,
+                                                    scheme: 'http',
+                                                    path:
+                                                        '/api/posts/${_post?["id"]}',
+                                                  ),
+                                                  headers: {
+                                                    'Authorization':
+                                                        'Bearer $_token'
+                                                  },
+                                                );
+                                                debugPrint(response.body);
+                                                if (response.statusCode ==
+                                                    200) {
+                                                  Future.sync(() =>
+                                                      Navigator.pushReplacement(
+                                                          context,
+                                                          PageTransition(
+                                                              child: const Posts(
+                                                                  title: Text(
+                                                                      'Posts')),
+                                                              type:
+                                                                  PageTransitionType
+                                                                      .fade)));
+                                                }
                                               } else if (value == 'closeEdit') {
                                                 setState(() {
                                                   _isEditable = false;
