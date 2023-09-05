@@ -23,6 +23,8 @@ class PostCommentsController extends Controller
                 'comments.id',
                 'users.name',
                 'comments.comment',
+                'comments.likes',
+                'comments.dislikes',
                 'comments.created_at',
             )
             ->orderBy('comments.created_at', 'desc')
@@ -64,7 +66,8 @@ class PostCommentsController extends Controller
      */
     public function show(string $id)
     {
-        //
+	$comment = Comment::find($id);
+	return response($comment);
     }
 
     /**
@@ -146,9 +149,7 @@ class PostCommentsController extends Controller
 
             $comment->save();
 
-            return response([
-                'message' => ($like && $like->like) ? 'unlike' : 'like'
-            ], 201);
+            return response($comment, 201);
         } catch (\Exception $e) {
             return response($e->getMessage(), 500);
         }
@@ -191,9 +192,7 @@ class PostCommentsController extends Controller
 
             $comment->save();
 
-            return response([
-                'message' => ($like && $like->like) ? 'undislike' : 'dislike'
-            ], 201);
+            return response($comment, 201);
         } catch (\Exception $e) {
             return response($e->getMessage(), 500);
         }

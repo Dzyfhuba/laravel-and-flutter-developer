@@ -325,16 +325,19 @@ class PostShowState extends State<PostShow> {
                                                 debugPrint(response.body);
                                                 if (response.statusCode ==
                                                     200) {
-                                                  Future.sync(() =>
-                                                      Navigator.pushReplacement(
-                                                          context,
-                                                          PageTransition(
-                                                              child: const Posts(
-                                                                  title: Text(
-                                                                      'Posts')),
-                                                              type:
-                                                                  PageTransitionType
-                                                                      .fade)));
+                                                  Future.sync(
+                                                    () => Navigator
+                                                        .pushReplacement(
+                                                      context,
+                                                      PageTransition(
+                                                        child: const Posts(
+                                                          title: Text('Posts'),
+                                                        ),
+                                                        type: PageTransitionType
+                                                            .fade,
+                                                      ),
+                                                    ),
+                                                  );
                                                 }
                                               } else if (value == 'closeEdit') {
                                                 setState(() {

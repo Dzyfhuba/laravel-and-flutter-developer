@@ -20,6 +20,7 @@ class CommentCardState extends State<CommentCard> {
   Map<String, dynamic>? _comment;
   bool _enableEdit = false;
   String _token = '';
+  Map<String, dynamic>? _user;
   TextEditingController commentField = TextEditingController();
   final _commentForm = GlobalKey<FormState>();
 
@@ -27,10 +28,12 @@ class CommentCardState extends State<CommentCard> {
     final prefs = await SharedPreferences.getInstance();
 
     String? token = prefs.getString('token');
+    String? user = prefs.getString('user');
 
     setState(() {
       _comment = widget.comment;
       _token = token!;
+      _user = jsonDecode(user!);
     });
   }
 
@@ -71,7 +74,29 @@ class CommentCardState extends State<CommentCard> {
     return response.statusCode == 201;
   }
 
-  void handleThumb(String action) async {}
+  void handleThumb(String action) async {
+    var response = await http.get(
+        Uri(
+          host: '192.168.131.28',
+          scheme: 'http',
+          port: 8000,
+          path: '/api/posts/comments/${_comment?["id"]}/$action',
+        ),
+        headers: {'Authorization': 'Bearer $_token'});
+    debugPrint(response.body);
+    if (response.statusCode == 500) {
+      return;
+    }
+
+    var data = jsonDecode(response.body);
+
+    setState(() {
+      // _comment?['${action}s'] +=
+      //     (data['message'] == 'like' || data['message'] == 'dislike') ? 1 : -1;
+      _comment?['likes'] = data['likes'];
+      _comment?['dislikes'] = data['dislikes'];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +122,7 @@ class CommentCardState extends State<CommentCard> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                (false)
+                (_user?['name'] != _comment?['name'])
                     ? Container()
                     : OpsiButton(
                         isEditable: _enableEdit,
@@ -188,12 +213,12 @@ class CommentCardState extends State<CommentCard> {
                         color: Color(0xFFFF8C00),
                         size: 16,
                       ),
-                      // Text(
-                      //   (_post?['likes'] ?? '').toString(),
-                      //   style: const TextStyle(
-                      //     color: Color(0xFFFF8C00),
-                      //   ),
-                      // )
+                      Text(
+                        (_comment?['likes'] ?? '').toString(),
+                        style: const TextStyle(
+                          color: Color(0xFFFF8C00),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -223,12 +248,12 @@ class CommentCardState extends State<CommentCard> {
                         color: Color(0xFFFF8C00),
                         size: 16,
                       ),
-                      // Text(
-                      //   (_post?['dislikes'] ?? '').toString(),
-                      //   style: const TextStyle(
-                      //     color: Color(0xFFFF8C00),
-                      //   ),
-                      // )
+                      Text(
+                        (_comment?['dislikes'] ?? '').toString(),
+                        style: const TextStyle(
+                          color: Color(0xFFFF8C00),
+                        ),
+                      )
                     ],
                   ),
                 )

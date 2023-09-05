@@ -2,6 +2,10 @@
 
 [test instruction](https://docs.google.com/document/d/11kMjrNMuPdJNtMHIyENkp2v1f2z5rXhI9Xr6Xz_kDJ8/edit?usp=drivesdk)
 
+## Laravel
+> - Laravel 10  
+> - php 8.2  
+> - MySQL  
 1. cloning
 ```bash
 git clone https://github.com/Dzyfhuba/laravel-and-flutter-developer.git test-hafidz
@@ -20,3 +24,7 @@ php artisan migrate
 php artisan db:seed
 php artisan serve
 ```
+
+## Flutter
+> - Dart 3.1
+> - Tested on android only
