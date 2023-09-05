@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 // import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:http/http.dart' as http;
-import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:flutter_quill/flutter_quill.dart';
@@ -20,7 +19,7 @@ class PostCreate extends StatefulWidget {
 class PostCreateState extends State<PostCreate> {
   TextEditingController titleField = TextEditingController();
   // QuillController contentField = QuillController.basic();
-  HtmlEditorController contentField = HtmlEditorController();
+  TextEditingController contentField = TextEditingController();
   bool statusField = true;
   String _publishedDateField = '';
   final _form = GlobalKey<FormState>();
@@ -33,7 +32,7 @@ class PostCreateState extends State<PostCreate> {
     var body = {
       'title': titleField.text,
       // 'content': contentField.document.toPlainText(),
-      'content': await contentField.getText(),
+      'content': contentField.text,
       'status': statusField,
       'published_date': _publishedDateField
     };
@@ -170,21 +169,24 @@ class PostCreateState extends State<PostCreate> {
                   ),
                 ),
                 Expanded(
-                  child: HtmlEditor(
+                  child: TextFormField(
                     controller: contentField,
-                    htmlEditorOptions: const HtmlEditorOptions(
-                      hint: 'Type here...',
+                    decoration: const InputDecoration(
+                      hintText: 'Type your content here...',
                     ),
-                    htmlToolbarOptions: const HtmlToolbarOptions(
-                      defaultToolbarButtons: [
-                        StyleButtons(),
-                        ColorButtons(),
-                        ListButtons(),
-                        ParagraphButtons(),
-                        // InsertButtons(),
-                        OtherButtons(),
-                      ],
-                    ),
+                    minLines: 5,
+                    maxLength: 1000,
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'This field is required';
+                      }
+                      if (value.length < 5) {
+                        return 'This field must be more than 4 characters';
+                      }
+                      return null;
+                    },
                   ),
                 ),
                 // QuillToolbar.basic(

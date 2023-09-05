@@ -210,6 +210,22 @@ class PostShowState extends State<PostShow> {
                                   _post?['content'] ?? '',
                                   textScaleFactor: 0.8,
                                 ),
+                                // HtmlEditor(
+                                //   controller: content,
+                                //   htmlToolbarOptions: const HtmlToolbarOptions(
+                                //     defaultToolbarButtons: [
+                                //       StyleButtons(style: false)
+                                //     ],
+                                //     toolbarPosition:
+                                //         ToolbarPosition.belowEditor,
+                                //   ),
+                                //   htmlEditorOptions: const HtmlEditorOptions(
+                                //     disabled: true,
+                                //     autoAdjustHeight: true,
+                                //     shouldEnsureVisible: true,
+                                //   ),
+                                //   otherOptions: const OtherOptions(height: 250),
+                                // ),
                                 Row(
                                   children: [
                                     TextButton(
