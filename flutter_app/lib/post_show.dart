@@ -263,411 +263,470 @@ class PostShowState extends State<PostShow> {
             ),
           ),
         ),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            setState(() {
-              _comments = [];
-            });
-            Future.delayed(
-              const Duration(microseconds: 100),
-              () {
-                getData();
-              },
-            );
-          },
-          child: LayoutBuilder(
-            builder: (context, constrain) {
-              return SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constrain.maxHeight),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Card(
-                        child: SizedBox(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      _post?['author'] ?? '',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    _user?['name'] == _post?['author']
-                                        ? PopupMenuButton(
-                                            onSelected: (value) async {
-                                              if (value == 'edit') {
-                                                setState(() {
-                                                  _isEditable = true;
-                                                });
-                                              } else if (value == 'delete') {
-                                                var response =
-                                                    await http.delete(
-                                                  Uri(
-                                                    host: '192.168.131.28',
-                                                    port: 8000,
-                                                    scheme: 'http',
-                                                    path:
-                                                        '/api/posts/${_post?["id"]}',
-                                                  ),
-                                                  headers: {
-                                                    'Authorization':
-                                                        'Bearer $_token'
-                                                  },
-                                                );
-                                                debugPrint(response.body);
-                                                if (response.statusCode ==
-                                                    200) {
-                                                  Future.sync(
-                                                    () => Navigator
-                                                        .pushReplacement(
-                                                      context,
-                                                      PageTransition(
-                                                        child: const Posts(
-                                                          title: Text('Posts'),
+        body: (_post == null && _user == null)
+            ? const Center(child: Text('Loading...'))
+            : RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    _comments = [];
+                  });
+                  Future.delayed(
+                    const Duration(microseconds: 100),
+                    () {
+                      getData();
+                    },
+                  );
+                },
+                child: LayoutBuilder(
+                  builder: (context, constrain) {
+                    return SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints:
+                            BoxConstraints(minHeight: constrain.maxHeight),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Card(
+                              child: SizedBox(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Wrap(
+                                            children: [
+                                              Text(
+                                                _post?['author'],
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              (_post?['author'] ==
+                                                      _user?['name'])
+                                                  ? Icon(_post?['status'] == 1
+                                                      ? Icons.visibility
+                                                      : Icons.visibility_off)
+                                                  : Container()
+                                            ],
+                                          ),
+                                          _user?['name'] == _post?['author']
+                                              ? PopupMenuButton(
+                                                  onSelected: (value) async {
+                                                    if (value == 'edit') {
+                                                      setState(() {
+                                                        _isEditable = true;
+                                                      });
+                                                    } else if (value ==
+                                                        'delete') {
+                                                      var response =
+                                                          await http.delete(
+                                                        Uri(
+                                                          host:
+                                                              '192.168.131.28',
+                                                          port: 8000,
+                                                          scheme: 'http',
+                                                          path:
+                                                              '/api/posts/${_post?["id"]}',
                                                         ),
-                                                        type: PageTransitionType
-                                                            .fade,
+                                                        headers: {
+                                                          'Authorization':
+                                                              'Bearer $_token'
+                                                        },
+                                                      );
+                                                      debugPrint(response.body);
+                                                      if (response.statusCode ==
+                                                          200) {
+                                                        Future.sync(
+                                                          () => Navigator
+                                                              .pushReplacement(
+                                                            context,
+                                                            PageTransition(
+                                                              child:
+                                                                  const Posts(
+                                                                title: Text(
+                                                                    'Posts'),
+                                                              ),
+                                                              type:
+                                                                  PageTransitionType
+                                                                      .fade,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }
+                                                    } else if (value ==
+                                                        'closeEdit') {
+                                                      setState(() {
+                                                        _isEditable = false;
+                                                      });
+                                                    }
+                                                  },
+                                                  itemBuilder: (context) =>
+                                                      _isEditable
+                                                          ? <PopupMenuEntry>[
+                                                              const PopupMenuItem(
+                                                                value:
+                                                                    'closeEdit',
+                                                                child: Row(
+                                                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    Icon(
+                                                                        Icons
+                                                                            .cancel,
+                                                                        size:
+                                                                            18),
+                                                                    Text(
+                                                                        'close')
+                                                                  ],
+                                                                ),
+                                                              )
+                                                            ]
+                                                          : [
+                                                              const PopupMenuItem(
+                                                                value: 'edit',
+                                                                child: Row(
+                                                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    Icon(
+                                                                        Icons
+                                                                            .edit,
+                                                                        size:
+                                                                            18),
+                                                                    Text('Edit')
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              const PopupMenuItem(
+                                                                value: 'delete',
+                                                                child: Row(
+                                                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    Icon(
+                                                                        Icons
+                                                                            .delete,
+                                                                        size:
+                                                                            18),
+                                                                    Text(
+                                                                        'Delete')
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                )
+                                              : Container()
+                                        ],
+                                      ),
+                                      _isEditable
+                                          ? Form(
+                                              key: _postForm,
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      const Text('Status: '),
+                                                      Switch(
+                                                        activeColor:
+                                                            const Color(
+                                                                0xFFE68A00),
+                                                        value: _statusField,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            _statusField =
+                                                                value;
+                                                          });
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Container(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: TextButton(
+                                                      style: const ButtonStyle(
+                                                        backgroundColor:
+                                                            MaterialStatePropertyAll(
+                                                          Color.fromRGBO(230,
+                                                              138, 0, 0.531),
+                                                        ),
+                                                      ),
+                                                      onPressed: () async {
+                                                        var date =
+                                                            await showDatePicker(
+                                                          context: context,
+                                                          initialDate: DateTime(
+                                                              DateTime.now()
+                                                                  .year,
+                                                              DateTime.now()
+                                                                  .month,
+                                                              DateTime.now()
+                                                                  .day),
+                                                          firstDate: DateTime
+                                                              .parse(DateTime
+                                                                      .now()
+                                                                  .toString()
+                                                                  .substring(
+                                                                      0, 10)),
+                                                          lastDate:
+                                                              DateTime.parse(
+                                                                  '2099-12-31'),
+                                                        );
+                                                        if (date == null)
+                                                          return;
+                                                        setState(() {
+                                                          _publishedDateField =
+                                                              DateFormat(
+                                                                      'y-MM-dd')
+                                                                  .format(date);
+                                                        });
+                                                      },
+                                                      child: Text(
+                                                        'Published Date: $_publishedDateField',
+                                                        style: const TextStyle(
+                                                            color:
+                                                                Colors.black),
                                                       ),
                                                     ),
-                                                  );
-                                                }
-                                              } else if (value == 'closeEdit') {
-                                                setState(() {
-                                                  _isEditable = false;
-                                                });
-                                              }
-                                            },
-                                            itemBuilder: (context) =>
-                                                _isEditable
-                                                    ? <PopupMenuEntry>[
-                                                        const PopupMenuItem(
-                                                          value: 'closeEdit',
-                                                          child: Row(
-                                                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            children: [
-                                                              Icon(Icons.cancel,
-                                                                  size: 18),
-                                                              Text('close')
-                                                            ],
-                                                          ),
-                                                        )
-                                                      ]
-                                                    : [
-                                                        const PopupMenuItem(
-                                                          value: 'edit',
-                                                          child: Row(
-                                                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            children: [
-                                                              Icon(Icons.edit,
-                                                                  size: 18),
-                                                              Text('Edit')
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        const PopupMenuItem(
-                                                          value: 'delete',
-                                                          child: Row(
-                                                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            children: [
-                                                              Icon(Icons.delete,
-                                                                  size: 18),
-                                                              Text('Delete')
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                          )
-                                        : Container()
-                                  ],
-                                ),
-                                _isEditable
-                                    ? Form(
-                                        key: _postForm,
-                                        child: Column(
-                                          children: [
-                                            Row(
+                                                  ),
+                                                  TextFormField(
+                                                    controller: _contentField,
+                                                    validator: (value) {
+                                                      if (value == null ||
+                                                          value.isEmpty) {
+                                                        return 'This field is required';
+                                                      }
+                                                      if (value.length < 5) {
+                                                        return 'This field must be more than 4 characters';
+                                                      }
+                                                      return null;
+                                                    },
+                                                    minLines: 5,
+                                                    maxLength: 1000,
+                                                    maxLines: null,
+                                                    keyboardType:
+                                                        TextInputType.multiline,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      hintText:
+                                                          'Type content here..',
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    alignment:
+                                                        Alignment.topRight,
+                                                    child: TextButton(
+                                                      style: const ButtonStyle(
+                                                          backgroundColor:
+                                                              MaterialStatePropertyAll(
+                                                        Color(0xFFE68A00),
+                                                      )),
+                                                      onPressed: () {
+                                                        submitPost();
+                                                      },
+                                                      child: const Text('Save',
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xFF000000),
+                                                          )),
+                                                    ),
+                                                  )
+                                                ],
+                                              ))
+                                          : Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                const Text('Status: '),
-                                                Switch(
-                                                  activeColor:
-                                                      const Color(0xFFE68A00),
-                                                  value: _statusField,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _statusField = value;
-                                                    });
-                                                  },
+                                                Text(
+                                                  DateFormat('dd/MM/y').format(
+                                                    DateTime.parse(
+                                                      _post?['published_date'] ??
+                                                          DateTime.now()
+                                                              .toString(),
+                                                    ),
+                                                  ),
+                                                  textScaleFactor: 0.6,
+                                                  style: const TextStyle(
+                                                      color: Color(0xFF8B8B8B)),
+                                                ),
+                                                Text(
+                                                  _post?['content'] ?? '',
+                                                  textScaleFactor: 0.8,
                                                 ),
                                               ],
                                             ),
-                                            Container(
-                                              alignment: Alignment.topLeft,
-                                              child: TextButton(
-                                                style: const ButtonStyle(
-                                                  backgroundColor:
-                                                      MaterialStatePropertyAll(
-                                                    Color.fromRGBO(
-                                                        230, 138, 0, 0.531),
+                                      Row(
+                                        children: [
+                                          TextButton(
+                                            style: ButtonStyle(
+                                              shape: MaterialStateProperty.all(
+                                                const RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(18),
+                                                    bottomLeft:
+                                                        Radius.circular(18),
                                                   ),
-                                                ),
-                                                onPressed: () async {
-                                                  var date =
-                                                      await showDatePicker(
-                                                    context: context,
-                                                    initialDate: DateTime(
-                                                        DateTime.now().year,
-                                                        DateTime.now().month,
-                                                        DateTime.now().day),
-                                                    firstDate: DateTime.parse(
-                                                        DateTime.now()
-                                                            .toString()
-                                                            .substring(0, 10)),
-                                                    lastDate: DateTime.parse(
-                                                        '2099-12-31'),
-                                                  );
-                                                  if (date == null) return;
-                                                  setState(() {
-                                                    _publishedDateField =
-                                                        DateFormat('y-MM-dd')
-                                                            .format(date);
-                                                  });
-                                                },
-                                                child: Text(
-                                                  'Published Date: $_publishedDateField',
-                                                  style: const TextStyle(
-                                                      color: Colors.black),
+                                                  side: BorderSide(
+                                                    color: Colors.red,
+                                                    strokeAlign: 0,
+                                                  ),
                                                 ),
                                               ),
                                             ),
+                                            onPressed: () async {
+                                              handleThumb('like');
+                                            },
+                                            child: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.thumb_up_rounded,
+                                                  color: Color(0xFFFF8C00),
+                                                ),
+                                                Text(
+                                                  (_post?['likes'] ?? '')
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                    color: Color(0xFFFF8C00),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              handleThumb('dislike');
+                                            },
+                                            style: ButtonStyle(
+                                              shape: MaterialStateProperty.all(
+                                                const RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    topRight:
+                                                        Radius.circular(18),
+                                                    bottomRight:
+                                                        Radius.circular(18),
+                                                  ),
+                                                  side: BorderSide(
+                                                    color: Colors.red,
+                                                    strokeAlign: 0,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.thumb_down_rounded,
+                                                  color: Color(0xFFFF8C00),
+                                                ),
+                                                Text(
+                                                  (_post?['dislikes'] ?? '')
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                    color: Color(0xFFFF8C00),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Card(
+                              child: SizedBox(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    children: [
+                                      const ButtonBar(
+                                        alignment: MainAxisAlignment.center,
+                                        children: [
+                                          Column(
+                                            children: [
+                                              Text(
+                                                'Comments',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                      Form(
+                                        key: _commentForm,
+                                        child: Column(
+                                          children: [
                                             TextFormField(
-                                              controller: _contentField,
+                                              onEditingComplete: () {
+                                                debugPrint('comment');
+                                                handleComment();
+                                              },
+                                              decoration: InputDecoration(
+                                                labelText: 'Comment Here',
+                                                suffixIcon: IconButton(
+                                                  onPressed: () {
+                                                    debugPrint('comment');
+                                                    handleComment();
+                                                  },
+                                                  icon: const Icon(Icons.send,
+                                                      color: Color(0xFFFF8C00)),
+                                                ),
+                                              ),
+                                              controller: commentField,
                                               validator: (value) {
                                                 if (value == null ||
                                                     value.isEmpty) {
                                                   return 'This field is required';
                                                 }
-                                                if (value.length < 5) {
-                                                  return 'This field must be more than 4 characters';
-                                                }
+
                                                 return null;
                                               },
-                                              minLines: 5,
-                                              maxLength: 1000,
-                                              maxLines: null,
-                                              keyboardType:
-                                                  TextInputType.multiline,
-                                              decoration: const InputDecoration(
-                                                hintText: 'Type content here..',
-                                              ),
                                             ),
-                                            Container(
-                                              alignment: Alignment.topRight,
-                                              child: TextButton(
-                                                style: const ButtonStyle(
-                                                    backgroundColor:
-                                                        MaterialStatePropertyAll(
-                                                  Color(0xFFE68A00),
-                                                )),
-                                                onPressed: () {
-                                                  submitPost();
-                                                },
-                                                child: const Text('Save',
-                                                    style: TextStyle(
-                                                      color: Color(0xFF000000),
-                                                    )),
-                                              ),
-                                            )
                                           ],
-                                        ))
-                                    : Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        ),
+                                      ),
+                                      Column(
                                         children: [
-                                          Text(
-                                            DateFormat('dd/MM/y').format(
-                                              DateTime.parse(
-                                                _post?['published_date'] ??
-                                                    DateTime.now().toString(),
-                                              ),
-                                            ),
-                                            textScaleFactor: 0.6,
-                                            style: const TextStyle(
-                                                color: Color(0xFF8B8B8B)),
-                                          ),
-                                          Text(
-                                            _post?['content'] ?? '',
-                                            textScaleFactor: 0.8,
-                                          ),
+                                          for (var comment in _comments)
+                                            CommentCard(
+                                              comment: comment,
+                                              onRefresh: () {
+                                                setState(() {
+                                                  _comments = [];
+                                                });
+                                                Future.delayed(
+                                                  const Duration(
+                                                      milliseconds: 100),
+                                                  () {
+                                                    getData();
+                                                  },
+                                                );
+                                              },
+                                            )
                                         ],
-                                      ),
-                                Row(
-                                  children: [
-                                    TextButton(
-                                      style: ButtonStyle(
-                                        shape: MaterialStateProperty.all(
-                                          const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(18),
-                                              bottomLeft: Radius.circular(18),
-                                            ),
-                                            side: BorderSide(
-                                              color: Colors.red,
-                                              strokeAlign: 0,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      onPressed: () async {
-                                        handleThumb('like');
-                                      },
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.thumb_up_rounded,
-                                            color: Color(0xFFFF8C00),
-                                          ),
-                                          Text(
-                                            (_post?['likes'] ?? '').toString(),
-                                            style: const TextStyle(
-                                              color: Color(0xFFFF8C00),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () async {
-                                        handleThumb('dislike');
-                                      },
-                                      style: ButtonStyle(
-                                        shape: MaterialStateProperty.all(
-                                          const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.only(
-                                              topRight: Radius.circular(18),
-                                              bottomRight: Radius.circular(18),
-                                            ),
-                                            side: BorderSide(
-                                              color: Colors.red,
-                                              strokeAlign: 0,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.thumb_down_rounded,
-                                            color: Color(0xFFFF8C00),
-                                          ),
-                                          Text(
-                                            (_post?['dislikes'] ?? '')
-                                                .toString(),
-                                            style: const TextStyle(
-                                              color: Color(0xFFFF8C00),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Card(
-                        child: SizedBox(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                const ButtonBar(
-                                  alignment: MainAxisAlignment.center,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Text(
-                                          'Comments',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                                Form(
-                                  key: _commentForm,
-                                  child: Column(
-                                    children: [
-                                      TextFormField(
-                                        onEditingComplete: () {
-                                          debugPrint('comment');
-                                          handleComment();
-                                        },
-                                        decoration: InputDecoration(
-                                          labelText: 'Comment Here',
-                                          suffixIcon: IconButton(
-                                            onPressed: () {
-                                              debugPrint('comment');
-                                              handleComment();
-                                            },
-                                            icon: const Icon(Icons.send,
-                                                color: Color(0xFFFF8C00)),
-                                          ),
-                                        ),
-                                        controller: commentField,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'This field is required';
-                                          }
-
-                                          return null;
-                                        },
-                                      ),
+                                      )
                                     ],
                                   ),
                                 ),
-                                Column(
-                                  children: [
-                                    for (var comment in _comments)
-                                      CommentCard(
-                                        comment: comment,
-                                        onRefresh: () {
-                                          setState(() {
-                                            _comments = [];
-                                          });
-                                          Future.delayed(
-                                            const Duration(milliseconds: 100),
-                                            () {
-                                              getData();
-                                            },
-                                          );
-                                        },
-                                      )
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
+                              ),
+                            )
+                          ],
                         ),
-                      )
-                    ],
-                  ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ),
+              ),
       ),
     );
   }

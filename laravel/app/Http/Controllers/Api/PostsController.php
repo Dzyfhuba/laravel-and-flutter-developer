@@ -24,8 +24,13 @@ class PostsController extends Controller
             $posts->where('author', 'like', "%{$request->query('author')}%");
         if ($request->query('date'))
             $posts->whereDate('published_date', $request->query('date'));
-
-        return response($posts->where('status', true)->get());
+            
+	$user = Auth::user();
+    	$posts = $posts->where(function($query) use ($user) {
+    		$query->where('status', true)
+    			->orWhere('author', $user->name);
+    	})->get();
+        return response($posts);
     }
 
     /**

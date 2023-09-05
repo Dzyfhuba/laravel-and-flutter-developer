@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/post_show.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PostCard extends StatefulWidget {
   final Map<String, dynamic> post;
@@ -14,15 +17,22 @@ class PostCard extends StatefulWidget {
 
 class PostCardState extends State<PostCard> {
   Map<String, dynamic>? _post;
+  Map<String, dynamic>? _user;
+
+  void getData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      _user = jsonDecode(prefs.getString('user')!);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _post = widget.post;
-    setState(() {});
-    // getData();
+    getData();
   }
-  // PostCardState({required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +45,20 @@ class PostCardState extends State<PostCard> {
             children: [
               // Text('asd')
 
-              Text(
-                _post?['author'],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+              Wrap(
+                children: [
+                  Text(
+                    _post?['author'],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  (_post?['author'] == _user?['name'])
+                      ? Icon(_post?['status'] == 1
+                          ? Icons.visibility
+                          : Icons.visibility_off)
+                      : Container()
+                ],
               ),
               // ],
               // ),
@@ -62,13 +81,13 @@ class PostCardState extends State<PostCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Text(
-                          _post?['title'],
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                    Text(
+                      _post?['title'],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       _post!['content'].toString().replaceAll(
