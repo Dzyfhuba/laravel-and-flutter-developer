@@ -44,6 +44,8 @@ class CommentResource extends Resource
                 TextColumn::make('comment'),
                 TextColumn::make('post_id'),
                 TextColumn::make('user.name'),
+                TextColumn::make('likes'),
+                TextColumn::make('dislikes'),
                 TextColumn::make('updated_at')->date('Y-M-d'),
                 // Section::make('User')->relationship('users')
             ])

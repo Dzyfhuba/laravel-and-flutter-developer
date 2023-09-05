@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
+use App\Models\CommentLike;
 use Auth;
 use Illuminate\Http\Request;
 use Validator;
@@ -105,6 +106,96 @@ class PostCommentsController extends Controller
             ]);
         } catch (\Exception $e) {
             return response($e->getMessage(), $e->getCode());
+        }
+    }
+
+    public function like($id)
+    {
+        try {
+            $user = Auth::user();
+
+            $like = CommentLike::query()
+                ->where('user_id', $user->id)
+                ->where('comment_id', $id)
+                ->first();
+
+            $comment = Comment::find($id);
+
+            if ($like && $like->dislike) {
+                CommentLike::query()
+                ->where('user_id', $user->id)
+                ->where('comment_id', $id)
+                ->update([
+                    'dislike' => false
+                ]);
+                $comment->dislikes -= 1;
+            }
+
+            CommentLike::updateOrInsert([
+                'user_id' => $user->id,
+                'comment_id' => $id
+            ], [
+                'like' => ($like && $like->like) ? false : true
+            ]);
+
+            if ($like && $like->like) {
+                $comment->likes = $comment->likes + (($like && $like->like) ? -1 : 1);
+            } else {
+                $comment->likes += 1;
+            }
+
+            $comment->save();
+
+            return response([
+                'message' => ($like && $like->like) ? 'unlike' : 'like'
+            ], 201);
+        } catch (\Exception $e) {
+            return response($e->getMessage(), 500);
+        }
+    }
+
+    public function dislike($id)
+    {
+        try {
+            $user = Auth::user();
+
+            $like = CommentLike::query()
+                ->where('user_id', $user->id)
+                ->where('comment_id', $id)
+                ->first();
+
+            $comment = Comment::find($id);
+
+            if ($like && $like->like) {
+                CommentLike::query()
+                ->where('user_id', $user->id)
+                ->where('comment_id', $id)
+                ->update([
+                    'like' => false
+                ]);
+                $comment->likes -= 1;
+            }
+
+            CommentLike::updateOrInsert([
+                'user_id' => $user->id,
+                'comment_id' => $id
+            ], [
+                'dislike' => ($like && $like->dislike) ? false : true
+            ]);
+
+            if ($like && $like->dislike) {
+                $comment->dislikes = $comment->dislikes + (($like && $like->dislike) ? -1 : 1);
+            } else {
+                $comment->dislikes += 1;
+            }
+
+            $comment->save();
+
+            return response([
+                'message' => ($like && $like->like) ? 'undislike' : 'dislike'
+            ], 201);
+        } catch (\Exception $e) {
+            return response($e->getMessage(), 500);
         }
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Post;
 use Auth;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -33,7 +34,7 @@ class PostResource extends Resource
                 TextInput::make('author')->required()->readOnly()->default(Auth::user()->name),
                 Toggle::make('status')->required(),
                 DatePicker::make('published_date')->required(),
-                RichEditor::make('content')->required()->columnSpanFull(),
+                Textarea::make('content')->required()->columnSpanFull()->rows(4),
             ]);
     }
 
