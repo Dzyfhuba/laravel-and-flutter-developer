@@ -20,6 +20,13 @@ class PostShowState extends State<PostShow> {
   TextEditingController commentField = TextEditingController();
   final _commentForm = GlobalKey<FormState>();
   List<dynamic> _comments = [];
+  Map<String, dynamic>? _user;
+  bool _isEditable = false;
+  final _postForm = GlobalKey<FormState>();
+  TextEditingController _contentField = TextEditingController();
+  TextEditingController _titleField = TextEditingController();
+  bool _statusField = true;
+  String _publishedDateField = '';
 
   void getData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -48,12 +55,22 @@ class PostShowState extends State<PostShow> {
       headers: {'Authorization': 'Bearer $token'},
     );
 
-    debugPrint(responseComment.body);
+    String? user = prefs.getString('user');
 
+    debugPrint(responseComment.body);
+    // debugPrint(jsonDecode(response.body)['status'].toString());
     setState(() {
       _post = jsonDecode(response.body);
       _token = token;
+      _user = jsonDecode(user!);
       _comments = jsonDecode(responseComment.body);
+
+      _contentField.text = jsonDecode(response.body)['content'];
+      _titleField.text = jsonDecode(response.body)['title'];
+      _publishedDateField = jsonDecode(response.body)['published_date']
+          .toString()
+          .substring(0, 10);
+      _statusField = jsonDecode(response.body)['status'].toString() == '1';
     });
 
     // setState(() {
@@ -128,6 +145,74 @@ class PostShowState extends State<PostShow> {
     getData();
   }
 
+  void submitPost() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String? token = prefs.getString('token');
+
+    var body = {
+      'title': _titleField.text,
+      'content': _contentField.text,
+      'status': _statusField,
+      'published_date': _publishedDateField
+    };
+
+    debugPrint(jsonEncode(body));
+
+    if (!_postForm.currentState!.validate()) {
+      return;
+    }
+
+    var isValidated = await Future.sync(() {
+      if (body['title'] == null || body['title'] == '') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Title is required')),
+        );
+        return false;
+      } else if (body['content'] == null || body['content'] == '') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Content is required')),
+        );
+        return false;
+      } else if (body['published_date'] == null ||
+          body['published_date'] == '') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Published Date is required')),
+        );
+        return false;
+      } else if (body['status'] == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Status is required')),
+        );
+        return false;
+      }
+      return true;
+    });
+
+    if (!isValidated) return;
+
+    var response = await http.put(
+      Uri(
+        host: '192.168.131.28',
+        port: 8000,
+        scheme: 'http',
+        path: '/api/posts/${_post?["id"]}',
+      ),
+      headers: {
+        'Authorization': 'Bearer $token',
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode(body),
+    );
+
+    debugPrint(jsonEncode(body));
+    debugPrint(response.body);
+
+    if (response.statusCode == 201) {
+      Future.sync(() => Navigator.pushReplacementNamed(context, '/'));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -141,16 +226,35 @@ class PostShowState extends State<PostShow> {
         appBarTheme: const AppBarTheme(
           backgroundColor: Color.fromRGBO(230, 138, 0, 1),
         ),
-        // iconButtonTheme: const IconButtonThemeData(
-        //   style: ButtonStyle(
-        //     iconColor: MaterialStatePropertyAll(
-        //       Color(0xFFFF8C00),
-        //     ),
-        //   ),
-        // ),
       ),
       home: Scaffold(
+        // floatingActionButton: _isEditable
+        //     ? FloatingActionButton(
+        //         backgroundColor: const Color(0xFFE68A00),
+        //         onPressed: () {
+        //           submitPost();
+        //         },
+        //         child: const Icon(Icons.save),
+        //       )
+        //     : null,
         appBar: AppBar(
+            title: _isEditable
+                ? TextFormField(
+                    controller: _titleField,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'This field is required';
+                      }
+                      if (value.length < 5) {
+                        return 'This field must be more than 4 characters';
+                      }
+                      return null;
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Type content here..',
+                    ),
+                  )
+                : Text(_post?['title'] ?? ''),
             leading: TextButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -190,42 +294,193 @@ class PostShowState extends State<PostShow> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  _post?['author'] ?? '',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  DateFormat('dd/MM/y').format(
-                                    DateTime.parse(
-                                      _post?['published_date'] ??
-                                          DateTime.now().toString(),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _post?['author'] ?? '',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
                                     ),
-                                  ),
-                                  textScaleFactor: 0.6,
-                                  style:
-                                      const TextStyle(color: Color(0xFF8B8B8B)),
+                                    _user?['name'] == _post?['author']
+                                        ? PopupMenuButton(
+                                            onSelected: (value) {
+                                              if (value == 'edit') {
+                                                setState(() {
+                                                  _isEditable = true;
+                                                });
+                                              } else if (value == 'delete') {
+                                                debugPrint('delete');
+                                              } else if (value == 'closeEdit') {
+                                                setState(() {
+                                                  _isEditable = false;
+                                                });
+                                              }
+                                            },
+                                            itemBuilder: (context) =>
+                                                _isEditable
+                                                    ? <PopupMenuEntry>[
+                                                        const PopupMenuItem(
+                                                          value: 'closeEdit',
+                                                          child: Row(
+                                                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Icon(Icons.cancel,
+                                                                  size: 18),
+                                                              Text('close')
+                                                            ],
+                                                          ),
+                                                        )
+                                                      ]
+                                                    : [
+                                                        const PopupMenuItem(
+                                                          value: 'edit',
+                                                          child: Row(
+                                                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Icon(Icons.edit,
+                                                                  size: 18),
+                                                              Text('Edit')
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const PopupMenuItem(
+                                                          value: 'delete',
+                                                          child: Row(
+                                                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Icon(Icons.delete,
+                                                                  size: 18),
+                                                              Text('Delete')
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                          )
+                                        : Container()
+                                  ],
                                 ),
-                                Text(
-                                  _post?['content'] ?? '',
-                                  textScaleFactor: 0.8,
-                                ),
-                                // HtmlEditor(
-                                //   controller: content,
-                                //   htmlToolbarOptions: const HtmlToolbarOptions(
-                                //     defaultToolbarButtons: [
-                                //       StyleButtons(style: false)
-                                //     ],
-                                //     toolbarPosition:
-                                //         ToolbarPosition.belowEditor,
-                                //   ),
-                                //   htmlEditorOptions: const HtmlEditorOptions(
-                                //     disabled: true,
-                                //     autoAdjustHeight: true,
-                                //     shouldEnsureVisible: true,
-                                //   ),
-                                //   otherOptions: const OtherOptions(height: 250),
-                                // ),
+                                _isEditable
+                                    ? Form(
+                                        key: _postForm,
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                const Text('Status: '),
+                                                Switch(
+                                                  activeColor:
+                                                      const Color(0xFFE68A00),
+                                                  value: _statusField,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      _statusField = value;
+                                                    });
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                            Container(
+                                              alignment: Alignment.topLeft,
+                                              child: TextButton(
+                                                style: const ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStatePropertyAll(
+                                                    Color.fromRGBO(
+                                                        230, 138, 0, 0.531),
+                                                  ),
+                                                ),
+                                                onPressed: () async {
+                                                  var date =
+                                                      await showDatePicker(
+                                                    context: context,
+                                                    initialDate: DateTime(
+                                                        DateTime.now().year,
+                                                        DateTime.now().month,
+                                                        DateTime.now().day),
+                                                    firstDate: DateTime.parse(
+                                                        DateTime.now()
+                                                            .toString()
+                                                            .substring(0, 10)),
+                                                    lastDate: DateTime.parse(
+                                                        '2099-12-31'),
+                                                  );
+                                                  if (date == null) return;
+                                                  setState(() {
+                                                    _publishedDateField =
+                                                        DateFormat('y-MM-dd')
+                                                            .format(date);
+                                                  });
+                                                },
+                                                child: Text(
+                                                  'Published Date: $_publishedDateField',
+                                                  style: const TextStyle(
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                            ),
+                                            TextFormField(
+                                              controller: _contentField,
+                                              validator: (value) {
+                                                if (value == null ||
+                                                    value.isEmpty) {
+                                                  return 'This field is required';
+                                                }
+                                                if (value.length < 5) {
+                                                  return 'This field must be more than 4 characters';
+                                                }
+                                                return null;
+                                              },
+                                              minLines: 5,
+                                              maxLength: 1000,
+                                              maxLines: null,
+                                              keyboardType:
+                                                  TextInputType.multiline,
+                                              decoration: const InputDecoration(
+                                                hintText: 'Type content here..',
+                                              ),
+                                            ),
+                                            Container(
+                                              alignment: Alignment.topRight,
+                                              child: TextButton(
+                                                style: const ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStatePropertyAll(
+                                                  Color(0xFFE68A00),
+                                                )),
+                                                onPressed: () {
+                                                  submitPost();
+                                                },
+                                                child: const Text('Save',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF000000),
+                                                    )),
+                                              ),
+                                            )
+                                          ],
+                                        ))
+                                    : Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            DateFormat('dd/MM/y').format(
+                                              DateTime.parse(
+                                                _post?['published_date'] ??
+                                                    DateTime.now().toString(),
+                                              ),
+                                            ),
+                                            textScaleFactor: 0.6,
+                                            style: const TextStyle(
+                                                color: Color(0xFF8B8B8B)),
+                                          ),
+                                          Text(
+                                            _post?['content'] ?? '',
+                                            textScaleFactor: 0.8,
+                                          ),
+                                        ],
+                                      ),
                                 Row(
                                   children: [
                                     TextButton(

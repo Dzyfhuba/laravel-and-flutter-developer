@@ -20,6 +20,7 @@ class PostCardState extends State<PostCard> {
     super.initState();
     _post = widget.post;
     setState(() {});
+    // getData();
   }
   // PostCardState({required this.post});
 
@@ -33,12 +34,15 @@ class PostCardState extends State<PostCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Text('asd')
+
               Text(
                 _post?['author'],
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              // ],
+              // ),
               Text(
                 DateFormat('dd/MM/y')
                     .format(DateTime.parse(_post?['published_date'])),
@@ -58,9 +62,13 @@ class PostCardState extends State<PostCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _post?['title'],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    Row(
+                      children: [
+                        Text(
+                          _post?['title'],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                     Text(
                       _post!['content'].toString().replaceAll(

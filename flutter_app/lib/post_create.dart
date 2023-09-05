@@ -71,17 +71,18 @@ class PostCreateState extends State<PostCreate> {
 
     if (!isValidated) return;
     var response = await http.post(
-        Uri(
-          host: '192.168.131.28',
-          port: 8000,
-          scheme: 'http',
-          path: '/api/posts',
-        ),
-        headers: {
-          'Authorization': 'Bearer $token',
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode(body));
+      Uri(
+        host: '192.168.131.28',
+        port: 8000,
+        scheme: 'http',
+        path: '/api/posts',
+      ),
+      headers: {
+        'Authorization': 'Bearer $token',
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode(body),
+    );
     debugPrint(response.body);
     debugPrint(jsonEncode(body));
     if (response.statusCode == 201) {
