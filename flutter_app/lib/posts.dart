@@ -3,10 +3,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_app/nav_bar.dart';
-import 'package:flutter_app/post_card.dart';
-import 'package:flutter_app/post_create.dart';
-import 'package:flutter_app/profile.dart';
+import 'package:postinaja/nav_bar.dart';
+import 'package:postinaja/post_card.dart';
+import 'package:postinaja/post_create.dart';
+import 'package:postinaja/profile.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';

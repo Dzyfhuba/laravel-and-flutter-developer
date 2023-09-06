@@ -3,8 +3,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_app/comment_card.dart';
-import 'package:flutter_app/posts.dart';
+import 'package:postinaja/comment_card.dart';
+import 'package:postinaja/posts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';

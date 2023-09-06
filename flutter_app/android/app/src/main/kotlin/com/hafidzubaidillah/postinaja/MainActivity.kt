@@ -1,4 +1,4 @@
-package com.example.flutter_app
+package com.hafidzubaidillah.postinaja
 
 import io.flutter.embedding.android.FlutterActivity
 
