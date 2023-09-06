@@ -23,6 +23,7 @@ class PostsState extends State<Posts> {
   List<dynamic>? _posts = [];
 
   final TextEditingController _authorFilter = TextEditingController();
+  final TextEditingController _searchField = TextEditingController();
   String? _dateStartFilter;
   String? _dateEndFilter;
 
@@ -42,6 +43,7 @@ class PostsState extends State<Posts> {
               'author': _authorFilter.text,
               'date_start': _dateStartFilter,
               'date_end': _dateEndFilter,
+              'search': _searchField.text,
             }),
         headers: {'Authorization': 'Bearer $token'});
     debugPrint(response.body);
@@ -118,108 +120,260 @@ class PostsState extends State<Posts> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        IconButton(
-                          alignment: Alignment.topRight,
-                          onPressed: () {
-                            showModalBottomSheet(
-                              enableDrag: false,
-                              context: context,
-                              showDragHandle: true,
-                              builder: (context) => Padding(
-                                padding: EdgeInsets.only(
-                                  left: 8,
-                                  right: 8,
-                                  top: 8,
-                                  bottom:
-                                      MediaQuery.of(context).viewInsets.bottom,
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Wrap(
-                                      alignment: WrapAlignment.end,
-                                      children: [
-                                        IconButton(
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: TextFormField(
+                            controller: _searchField,
+                            onChanged: (value) async {
+                              var data = await getData();
+                              setState(() {
+                                _posts = [];
+                              });
+                              Future.delayed(const Duration(milliseconds: 100),
+                                  () {
+                                setState(() {
+                                  _posts = data;
+                                });
+                              });
+                            },
+                            decoration: InputDecoration(
+                              constraints:
+                                  BoxConstraints(maxWidth: constrain.maxWidth),
+                              labelText: 'Search...',
+                              prefixIcon: const Icon(Icons.search),
+                              suffixIcon: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _searchField.text == ''
+                                      ? Container()
+                                      : IconButton(
                                           onPressed: () {
                                             setState(() {
-                                              _authorFilter.text = '';
-                                              _dateStartFilter = '';
+                                              _searchField.text = '';
                                             });
                                           },
-                                          icon: const Icon(Icons.delete),
+                                          icon: const Icon(Icons.close),
                                         ),
-                                        TextButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _posts = [];
-                                            });
-                                            Future.delayed(
-                                                const Duration(
-                                                    milliseconds: 100), () {
-                                              getData();
-                                            });
-                                            Navigator.pop(context);
-                                          },
-                                          style: const ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStatePropertyAll(
-                                              Color(0xFFFF8C00),
-                                            ),
+                                  IconButton(
+                                    alignment: Alignment.topRight,
+                                    onPressed: () {
+                                      showModalBottomSheet(
+                                        enableDrag: false,
+                                        context: context,
+                                        showDragHandle: true,
+                                        builder: (context) => Padding(
+                                          padding: EdgeInsets.only(
+                                            left: 8,
+                                            right: 8,
+                                            top: 8,
+                                            bottom: MediaQuery.of(context)
+                                                .viewInsets
+                                                .bottom,
                                           ),
-                                          child: const Text(
-                                            'Apply',
-                                            style: TextStyle(
-                                              color: Color.fromARGB(
-                                                  255, 255, 255, 255),
-                                            ),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Wrap(
+                                                alignment: WrapAlignment.end,
+                                                children: [
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _authorFilter.text = '';
+                                                        _dateStartFilter = '';
+                                                      });
+                                                    },
+                                                    icon: const Icon(
+                                                        Icons.delete),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _posts = [];
+                                                      });
+                                                      Future.delayed(
+                                                          const Duration(
+                                                              milliseconds:
+                                                                  100), () {
+                                                        getData();
+                                                      });
+                                                      Navigator.pop(context);
+                                                    },
+                                                    style: const ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStatePropertyAll(
+                                                        Color(0xFFFF8C00),
+                                                      ),
+                                                    ),
+                                                    child: const Text(
+                                                      'Apply',
+                                                      style: TextStyle(
+                                                        color: Color.fromARGB(
+                                                            255, 255, 255, 255),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              TextFormField(
+                                                autofocus: true,
+                                                controller: _authorFilter,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText: 'Author',
+                                                ),
+                                              ),
+                                              TextButton(
+                                                onPressed: () async {
+                                                  var date =
+                                                      await showDateRangePicker(
+                                                    context: context,
+                                                    initialDateRange:
+                                                        DateTimeRange(
+                                                            start:
+                                                                DateTime.now(),
+                                                            end:
+                                                                DateTime.now()),
+                                                    firstDate: DateTime(2000),
+                                                    lastDate: DateTime(3000),
+                                                  );
+                                                  if (date == null) return;
+                                                  setState(() {
+                                                    _dateStartFilter =
+                                                        DateFormat('y-MM-dd')
+                                                            .format(date.start);
+                                                  });
+                                                },
+                                                style: const ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStatePropertyAll(
+                                                    Color(0xFFFF8C00),
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  '''
+                          Published Date: $_dateStartFilter - $_dateEndFilter''',
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    TextFormField(
-                                      autofocus: true,
-                                      controller: _authorFilter,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Author',
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () async {
-                                        var date = await showDateRangePicker(
-                                          context: context,
-                                          initialDateRange: DateTimeRange(
-                                              start: DateTime.now(),
-                                              end: DateTime.now()),
-                                          firstDate: DateTime(2000),
-                                          lastDate: DateTime(3000),
-                                        );
-                                        if (date == null) return;
-                                        setState(() {
-                                          _dateStartFilter =
-                                              DateFormat('y-MM-dd')
-                                                  .format(date.start);
-                                        });
-                                      },
-                                      style: const ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStatePropertyAll(
-                                          Color(0xFFFF8C00),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        '''
-Published Date: $_dateStartFilter - $_dateEndFilter''',
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.filter_alt),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                          icon: const Icon(Icons.filter_alt),
+                            ),
+                          ),
                         ),
+                        //     IconButton(
+                        //       alignment: Alignment.topRight,
+                        //       onPressed: () {
+                        //         showModalBottomSheet(
+                        //           enableDrag: false,
+                        //           context: context,
+                        //           showDragHandle: true,
+                        //           builder: (context) => Padding(
+                        //             padding: EdgeInsets.only(
+                        //               left: 8,
+                        //               right: 8,
+                        //               top: 8,
+                        //               bottom: MediaQuery.of(context)
+                        //                   .viewInsets
+                        //                   .bottom,
+                        //             ),
+                        //             child: Column(
+                        //               mainAxisSize: MainAxisSize.min,
+                        //               children: [
+                        //                 Wrap(
+                        //                   alignment: WrapAlignment.end,
+                        //                   children: [
+                        //                     IconButton(
+                        //                       onPressed: () {
+                        //                         setState(() {
+                        //                           _authorFilter.text = '';
+                        //                           _dateStartFilter = '';
+                        //                         });
+                        //                       },
+                        //                       icon: const Icon(Icons.delete),
+                        //                     ),
+                        //                     TextButton(
+                        //                       onPressed: () {
+                        //                         setState(() {
+                        //                           _posts = [];
+                        //                         });
+                        //                         Future.delayed(
+                        //                             const Duration(
+                        //                                 milliseconds: 100), () {
+                        //                           getData();
+                        //                         });
+                        //                         Navigator.pop(context);
+                        //                       },
+                        //                       style: const ButtonStyle(
+                        //                         backgroundColor:
+                        //                             MaterialStatePropertyAll(
+                        //                           Color(0xFFFF8C00),
+                        //                         ),
+                        //                       ),
+                        //                       child: const Text(
+                        //                         'Apply',
+                        //                         style: TextStyle(
+                        //                           color: Color.fromARGB(
+                        //                               255, 255, 255, 255),
+                        //                         ),
+                        //                       ),
+                        //                     ),
+                        //                   ],
+                        //                 ),
+                        //                 TextFormField(
+                        //                   autofocus: true,
+                        //                   controller: _authorFilter,
+                        //                   decoration: const InputDecoration(
+                        //                     labelText: 'Author',
+                        //                   ),
+                        //                 ),
+                        //                 TextButton(
+                        //                   onPressed: () async {
+                        //                     var date =
+                        //                         await showDateRangePicker(
+                        //                       context: context,
+                        //                       initialDateRange: DateTimeRange(
+                        //                           start: DateTime.now(),
+                        //                           end: DateTime.now()),
+                        //                       firstDate: DateTime(2000),
+                        //                       lastDate: DateTime(3000),
+                        //                     );
+                        //                     if (date == null) return;
+                        //                     setState(() {
+                        //                       _dateStartFilter =
+                        //                           DateFormat('y-MM-dd')
+                        //                               .format(date.start);
+                        //                     });
+                        //                   },
+                        //                   style: const ButtonStyle(
+                        //                     backgroundColor:
+                        //                         MaterialStatePropertyAll(
+                        //                       Color(0xFFFF8C00),
+                        //                     ),
+                        //                   ),
+                        //                   child: Text(
+                        //                     '''
+                        // Published Date: $_dateStartFilter - $_dateEndFilter''',
+                        //                     style: const TextStyle(
+                        //                         color: Colors.white),
+                        //                   ),
+                        //                 ),
+                        //               ],
+                        //             ),
+                        //           ),
+                        //         );
+                        //       },
+                        //       icon: const Icon(Icons.filter_alt),
+                        //     ),
                         for (var post in _posts!)
                           PostCard(
                             post: post,
