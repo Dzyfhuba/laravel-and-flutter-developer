@@ -31,7 +31,7 @@ class PostsController extends Controller
     	$posts = $posts->where(function($query) use ($user) {
     		$query->where('status', true)
     			->orWhere('author', $user->name);
-    	})->get();
+    	})->orderBy('published_date', 'desc')->get();
         return response($posts);
     }
 

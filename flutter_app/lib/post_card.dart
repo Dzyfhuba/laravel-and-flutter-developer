@@ -79,7 +79,7 @@ class PostCardState extends State<PostCard> {
                   }
                 },
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
                       _post?['title'],
