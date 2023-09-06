@@ -29,3 +29,4 @@ php artisan serve
 > - Dart 3.1
 > - Tested on android only
 > - Android SDK version 34.0.0-rc3
+change IP in code (192.168.131.28) to your local IP
