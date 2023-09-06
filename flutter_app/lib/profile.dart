@@ -12,14 +12,12 @@ class Profile extends StatefulWidget {
 }
 
 class ProfileState extends State<Profile> {
-  Map<String, dynamic>? _profile;
   TextEditingController usernameField = TextEditingController();
 
   void getData() async {
     final prefs = await SharedPreferences.getInstance();
 
     setState(() {
-      _profile = jsonDecode(prefs.getString('user')!);
       usernameField.text = jsonDecode(prefs.getString('user')!)['name'];
     });
   }

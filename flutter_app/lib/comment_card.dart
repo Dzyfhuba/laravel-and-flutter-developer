@@ -91,8 +91,6 @@ class CommentCardState extends State<CommentCard> {
     var data = jsonDecode(response.body);
 
     setState(() {
-      // _comment?['${action}s'] +=
-      //     (data['message'] == 'like' || data['message'] == 'dislike') ? 1 : -1;
       _comment?['likes'] = data['likes'];
       _comment?['dislikes'] = data['dislikes'];
     });
@@ -147,8 +145,6 @@ class CommentCardState extends State<CommentCard> {
                           }
 
                           widget.onRefresh();
-                          // if (_comment != null) {
-                          // }
                         },
                       )
               ],
@@ -166,11 +162,9 @@ class CommentCardState extends State<CommentCard> {
                             suffixIcon: IconButton(
                               icon: const Icon(Icons.save),
                               onPressed: () {
-                                // debugPrint(commentField.text);
                                 handleSave();
                               },
                             )),
-                        // initialValue: _comment?['comment'] ?? '',
                         controller: commentField,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -227,7 +221,6 @@ class CommentCardState extends State<CommentCard> {
                     handleThumb('dislike');
                   },
                   style: ButtonStyle(
-                    // fixedSize: const MaterialStatePropertyAll(Size(4, 18)),
                     shape: MaterialStateProperty.all(
                       const RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
@@ -292,8 +285,6 @@ class OpsiButton extends StatelessWidget {
     required this.isEditable,
   });
 
-  // var _popoverKey
-
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
@@ -309,7 +300,6 @@ class OpsiButton extends StatelessWidget {
               const PopupMenuItem(
                 value: 'closeEdit',
                 child: Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [Icon(Icons.cancel, size: 18), Text('close')],
                 ),
               )
@@ -318,14 +308,12 @@ class OpsiButton extends StatelessWidget {
               const PopupMenuItem(
                 value: 'edit',
                 child: Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [Icon(Icons.edit, size: 18), Text('Edit')],
                 ),
               ),
               const PopupMenuItem(
                 value: 'delete',
                 child: Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [Icon(Icons.delete, size: 18), Text('Delete')],
                 ),
               ),

@@ -13,10 +13,10 @@ class Register extends StatefulWidget {
 
 class RegisterState extends State<Register> {
   final _form = GlobalKey<FormState>();
-  TextEditingController _emailField = TextEditingController();
-  TextEditingController _nameField = TextEditingController();
-  TextEditingController _passwordField = TextEditingController();
-  TextEditingController _confirmationField = TextEditingController();
+  final TextEditingController _emailField = TextEditingController();
+  final TextEditingController _nameField = TextEditingController();
+  final TextEditingController _passwordField = TextEditingController();
+  final TextEditingController _confirmationField = TextEditingController();
 
   Map<String, dynamic>? resposeErrorMessage = {};
   String? resposeSuccessMessage;
@@ -30,8 +30,6 @@ class RegisterState extends State<Register> {
 
     if (_form.currentState!.validate()) {
       return await formSubmit();
-      // debugPrint(emailField.text);
-      // debugPrint(passwordField.text);
     }
     return _form.currentState!.validate();
   }
@@ -103,9 +101,6 @@ class RegisterState extends State<Register> {
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'Name',
-                      // errorText: resposeMessage.containsKey("email") && resposeMessage['email'] != []
-                      //     ? resposeMessage['email'].toString()
-                      //     : null
                     ),
                     keyboardType: TextInputType.name,
                     controller: _nameField,
@@ -127,9 +122,6 @@ class RegisterState extends State<Register> {
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'Email',
-                      // errorText: resposeMessage.containsKey("email") && resposeMessage['email'] != []
-                      //     ? resposeMessage['email'].toString()
-                      //     : null
                     ),
                     keyboardType: TextInputType.emailAddress,
                     controller: _emailField,
@@ -197,10 +189,9 @@ class RegisterState extends State<Register> {
                                   if (value) {
                                     Navigator.of(context)
                                         .pushReplacementNamed("/posts");
-                                  } else {}
+                                  }
                                 },
                               );
-                              // Navigator.of(context).pushNamed("/posts");
                             },
                             style: const ButtonStyle(
                                 backgroundColor: MaterialStatePropertyAll(

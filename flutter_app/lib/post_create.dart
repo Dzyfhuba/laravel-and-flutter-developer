@@ -2,11 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-// import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:flutter_quill/flutter_quill.dart';
 
 class PostCreate extends StatefulWidget {
   final void Function() onCreate;
@@ -18,7 +16,6 @@ class PostCreate extends StatefulWidget {
 
 class PostCreateState extends State<PostCreate> {
   TextEditingController titleField = TextEditingController();
-  // QuillController contentField = QuillController.basic();
   TextEditingController contentField = TextEditingController();
   bool statusField = true;
   String _publishedDateField = '';
@@ -31,7 +28,6 @@ class PostCreateState extends State<PostCreate> {
 
     var body = {
       'title': titleField.text,
-      // 'content': contentField.document.toPlainText(),
       'content': contentField.text,
       'status': statusField,
       'published_date': _publishedDateField
@@ -86,7 +82,6 @@ class PostCreateState extends State<PostCreate> {
     debugPrint(response.body);
     debugPrint(jsonEncode(body));
     if (response.statusCode == 201) {
-      // Future.sync(() => Navigator.pushReplacementNamed(context, '/'));
       widget.onCreate();
     }
   }
@@ -139,12 +134,6 @@ class PostCreateState extends State<PostCreate> {
                     ),
                   ],
                 ),
-                // CalendarDatePicker(
-                //   initialDate: DateTime.now(),
-                //   firstDate: DateTime.now(),
-                //   lastDate: DateTime.now(),
-                //   onDateChanged: (value) {},
-                // ),
                 Container(
                   alignment: Alignment.topLeft,
                   child: TextButton(
@@ -190,17 +179,6 @@ class PostCreateState extends State<PostCreate> {
                     },
                   ),
                 ),
-                // QuillToolbar.basic(
-                //   controller: contentField,
-                // ),
-                // Expanded(
-                //   child: QuillEditor.basic(
-                //     placeholder: 'Type here...',
-                //     autoFocus: false,
-                //     controller: contentField,
-                //     readOnly: false,
-                //   ),
-                // )
               ],
             ),
           ),

@@ -43,8 +43,6 @@ class PostCardState extends State<PostCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Text('asd')
-
               Wrap(
                 children: [
                   Text(
@@ -60,8 +58,6 @@ class PostCardState extends State<PostCard> {
                       : Container()
                 ],
               ),
-              // ],
-              // ),
               Text(
                 DateFormat('dd/MM/y')
                     .format(DateTime.parse(_post?['published_date'])),

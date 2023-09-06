@@ -16,14 +16,13 @@ class Posts extends StatefulWidget {
 
   @override
   PostsState createState() => PostsState();
-  // State<StatefulWidget> createState() => PostsState();
 }
 
 class PostsState extends State<Posts> {
   int _pageIndex = 0;
   List<dynamic>? _posts = [];
 
-  TextEditingController _authorFilter = TextEditingController();
+  final TextEditingController _authorFilter = TextEditingController();
   String? _dateStartFilter;
   String? _dateEndFilter;
 
@@ -52,7 +51,6 @@ class PostsState extends State<Posts> {
     }
 
     setState(() {
-      // _token = token;
       _posts = jsonDecode(response.body);
     });
 
@@ -67,7 +65,6 @@ class PostsState extends State<Posts> {
 
   @override
   Widget build(BuildContext context) {
-    // debugPrint(jsonEncode(_posts));
     return MaterialApp(
       theme: ThemeData(
         cardTheme: const CardTheme(
@@ -78,7 +75,6 @@ class PostsState extends State<Posts> {
         textTheme: const TextTheme(
           bodyMedium: TextStyle(
             fontSize: 20.0,
-            // color: Colors.black,
           ),
         ),
         appBarTheme:
@@ -92,7 +88,6 @@ class PostsState extends State<Posts> {
             const Text('Profile'),
           ][_pageIndex],
         ),
-        // bottomSheet: BottomAppBar(child: Text('asd')),
         bottomNavigationBar: NavBar(
           pageIndex: _pageIndex,
           setPageIndex: (index) {
@@ -121,7 +116,6 @@ class PostsState extends State<Posts> {
                   child: ConstrainedBox(
                     constraints: BoxConstraints(minHeight: constrain.maxHeight),
                     child: Column(
-                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         IconButton(
@@ -140,7 +134,6 @@ class PostsState extends State<Posts> {
                                       MediaQuery.of(context).viewInsets.bottom,
                                 ),
                                 child: Column(
-                                  // crossAxisAlignment: CrossAxisAlignment.end,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Wrap(
@@ -152,13 +145,6 @@ class PostsState extends State<Posts> {
                                               _authorFilter.text = '';
                                               _dateStartFilter = '';
                                             });
-                                            // Future.delayed(
-                                            //   const Duration(milliseconds: 100),
-                                            //   () {
-                                            //     getData();
-                                            //   },
-                                            // );
-                                            // Navigator.pop(context);
                                           },
                                           icon: const Icon(Icons.delete),
                                         ),
@@ -263,15 +249,3 @@ Published Date: $_dateStartFilter - $_dateEndFilter''',
     );
   }
 }
-
-// class PostsPage extends StatelessWidget {
-//   const PostsPage({Key? key, required Text title}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const MaterialApp(
-//       title: 'Posts LAh',
-//       home: Posts(title: Text("asd")),
-//     );
-//   }
-// }

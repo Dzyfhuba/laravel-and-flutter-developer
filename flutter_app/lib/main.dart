@@ -8,15 +8,12 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  // runApp(const MyApp());
   runApp(MaterialApp(
-    // home: const LoginPage(title: Text('posts')),
     initialRoute: '/',
     routes: <String, WidgetBuilder>{
       '/': (context) => const LoginPage(title: Text('posts')),
       '/posts': (context) => const Posts(title: Text('posts')),
       '/register': (context) => const Register(),
-      // '/posts/show': (context) => const PostShow(),
     },
   ));
 }
@@ -46,10 +43,7 @@ class LoginForm extends State<LoginPage> {
   TextEditingController passwordField = TextEditingController();
   final _form = GlobalKey<FormState>();
   bool _isValid = false;
-  Map<String, dynamic> resposeErrorMessage = {
-    // "email": [],
-    // "password": [],
-  };
+  Map<String, dynamic> resposeErrorMessage = {};
   String? resposeSuccessMessage;
   bool _isNetworkError = false;
 
@@ -59,8 +53,6 @@ class LoginForm extends State<LoginPage> {
     });
     if (_form.currentState!.validate()) {
       return await formSubmit();
-      // debugPrint(emailField.text);
-      // debugPrint(passwordField.text);
     }
     return _form.currentState!.validate();
   }
@@ -108,8 +100,6 @@ class LoginForm extends State<LoginPage> {
         debugPrint(response.body);
       });
     }
-
-    // return body['isLoggedIn'];
   }
 
   @override
@@ -202,9 +192,6 @@ class LoginForm extends State<LoginPage> {
                         TextFormField(
                           decoration: const InputDecoration(
                             labelText: 'Email',
-                            // errorText: resposeMessage.containsKey("email") && resposeMessage['email'] != []
-                            //     ? resposeMessage['email'].toString()
-                            //     : null
                           ),
                           keyboardType: TextInputType.emailAddress,
                           controller: emailField,
@@ -245,10 +232,6 @@ class LoginForm extends State<LoginPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               TextButton(
-                                // onPressed: () => PageTransition(
-                                //   child: const Register(),
-                                //   type: PageTransitionType.leftToRight,
-                                // ),
                                 onPressed: () =>
                                     Navigator.pushNamed(context, '/register'),
                                 child: const Text(

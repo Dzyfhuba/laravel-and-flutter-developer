@@ -27,8 +27,8 @@ class PostShowState extends State<PostShow> {
   Map<String, dynamic>? _user;
   bool _isEditable = false;
   final _postForm = GlobalKey<FormState>();
-  TextEditingController _contentField = TextEditingController();
-  TextEditingController _titleField = TextEditingController();
+  final TextEditingController _contentField = TextEditingController();
+  final TextEditingController _titleField = TextEditingController();
   bool _statusField = true;
   String _publishedDateField = '';
 
@@ -46,8 +46,6 @@ class PostShowState extends State<PostShow> {
       ),
       headers: {'Authorization': 'Bearer $token'},
     );
-    // debugPrint('/api/posts/${_post?["id"]}');
-    // debugPrint(_token);
 
     var responseComment = await http.get(
       Uri(
@@ -62,7 +60,6 @@ class PostShowState extends State<PostShow> {
     String? user = prefs.getString('user');
 
     debugPrint(responseComment.body);
-    // debugPrint(jsonDecode(response.body)['status'].toString());
     setState(() {
       _post = jsonDecode(response.body);
       _token = token;
@@ -76,12 +73,6 @@ class PostShowState extends State<PostShow> {
           .substring(0, 10);
       _statusField = jsonDecode(response.body)['status'].toString() == '1';
     });
-
-    // setState(() {
-    //   _post = ;
-    // });
-    // setState(() {
-    // });
   }
 
   @override
@@ -254,8 +245,6 @@ class PostShowState extends State<PostShow> {
             onPressed: () {
               Navigator.pop(context);
             },
-            // child: const Text('datasda',
-            //     style: TextStyle(color: Color(0xFFFFFFFF))),
             child: const Icon(
               Icons.chevron_left_rounded,
               color: Color(0xffffffff),
@@ -373,7 +362,6 @@ class PostShowState extends State<PostShow> {
                                                                 value:
                                                                     'closeEdit',
                                                                 child: Row(
-                                                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                   children: [
                                                                     Icon(
                                                                         Icons
@@ -390,7 +378,6 @@ class PostShowState extends State<PostShow> {
                                                               const PopupMenuItem(
                                                                 value: 'edit',
                                                                 child: Row(
-                                                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                   children: [
                                                                     Icon(
                                                                         Icons
@@ -404,7 +391,6 @@ class PostShowState extends State<PostShow> {
                                                               const PopupMenuItem(
                                                                 value: 'delete',
                                                                 child: Row(
-                                                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                   children: [
                                                                     Icon(
                                                                         Icons
@@ -475,8 +461,9 @@ class PostShowState extends State<PostShow> {
                                                               DateTime.parse(
                                                                   '2099-12-31'),
                                                         );
-                                                        if (date == null)
+                                                        if (date == null) {
                                                           return;
+                                                        }
                                                         setState(() {
                                                           _publishedDateField =
                                                               DateFormat(

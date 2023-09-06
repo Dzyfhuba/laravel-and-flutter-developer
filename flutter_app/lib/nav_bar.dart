@@ -17,8 +17,8 @@ class _NavBarState extends State<NavBar> {
   int currentPageIndex = 0;
 
   @override
-  void didUpdateWidget(State) {
-    super.didUpdateWidget(State);
+  void didUpdateWidget(state) {
+    super.didUpdateWidget(state);
     setState(() {
       currentPageIndex = widget.pageIndex;
     });
