@@ -42,8 +42,8 @@ class ProfileState extends State<Profile> {
               children: [
                 TextFormField(
                   decoration: const InputDecoration(
-                    hintText: 'Username',
-                    labelText: 'Username',
+                    hintText: 'Name',
+                    labelText: 'Name',
                   ),
                   controller: usernameField,
                 ),

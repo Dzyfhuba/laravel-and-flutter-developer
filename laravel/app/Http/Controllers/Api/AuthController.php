@@ -13,7 +13,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|unique:users,name',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|confirmed'
         ]);
@@ -31,7 +31,8 @@ class AuthController extends Controller
 
         return response([
             'message' => 'register success',
-            'token' => $token->plainTextToken
+            'token' => $token->plainTextToken,
+	    'user' => $user
         ], 201);
     }
 

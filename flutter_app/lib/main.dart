@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/posts.dart';
+import 'package:flutter_app/register.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +15,7 @@ void main() {
     routes: <String, WidgetBuilder>{
       '/': (context) => const LoginPage(title: Text('posts')),
       '/posts': (context) => const Posts(title: Text('posts')),
+      '/register': (context) => const Register(),
       // '/posts/show': (context) => const PostShow(),
     },
   ));
@@ -239,25 +241,43 @@ class LoginForm extends State<LoginPage> {
                         ),
                         Container(
                           alignment: Alignment.topRight,
-                          child: TextButton(
-                              onPressed: () {
-                                _saveForm().then(
-                                  (value) {
-                                    if (value) {
-                                      Navigator.of(context)
-                                          .pushReplacementNamed("/posts");
-                                    } else {}
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              TextButton(
+                                // onPressed: () => PageTransition(
+                                //   child: const Register(),
+                                //   type: PageTransitionType.leftToRight,
+                                // ),
+                                onPressed: () =>
+                                    Navigator.pushNamed(context, '/register'),
+                                child: const Text(
+                                  "Doesn't have any account? sign up here.",
+                                ),
+                              ),
+                              TextButton(
+                                  onPressed: () {
+                                    _saveForm().then(
+                                      (value) {
+                                        if (value) {
+                                          Navigator.of(context)
+                                              .pushReplacementNamed("/posts");
+                                        } else {}
+                                      },
+                                    );
+                                    // Navigator.of(context).pushNamed("/posts");
                                   },
-                                );
-                                // Navigator.of(context).pushNamed("/posts");
-                              },
-                              style: const ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(
-                                      Color.fromRGBO(230, 138, 0, 1))),
-                              child: const Text(
-                                'Login',
-                                style: TextStyle(color: Colors.black),
-                              )),
+                                  style: const ButtonStyle(
+                                      backgroundColor: MaterialStatePropertyAll(
+                                          Color.fromRGBO(230, 138, 0, 1))),
+                                  child: const Text(
+                                    'Login',
+                                    style: TextStyle(
+                                        color:
+                                            Color.fromARGB(255, 255, 255, 255)),
+                                  )),
+                            ],
+                          ),
                         ),
                         resposeErrorMessage.containsKey("message")
                             ? Text(
