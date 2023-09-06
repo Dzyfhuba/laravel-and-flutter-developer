@@ -22,8 +22,10 @@ class PostsController extends Controller
             $posts->where('status', $request->query('status'));
         if ($request->query('author'))
             $posts->where('author', 'like', "%{$request->query('author')}%");
-        if ($request->query('date'))
-            $posts->whereDate('published_date', $request->query('date'));
+        if ($request->query('date_start'))
+            $posts->whereDate('published_date', '>=', $request->query('date_start'));
+        if ($request->query('date_end'))
+            $posts->whereDate('published_date', '<=', $request->query('date_end'));
             
 	$user = Auth::user();
     	$posts = $posts->where(function($query) use ($user) {

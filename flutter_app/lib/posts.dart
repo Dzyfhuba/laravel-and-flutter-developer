@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_app/post_card.dart';
 import 'package:flutter_app/post_create.dart';
 import 'package:flutter_app/profile.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Posts extends StatefulWidget {
@@ -17,9 +20,12 @@ class Posts extends StatefulWidget {
 }
 
 class PostsState extends State<Posts> {
-  // String? _token;
   int _pageIndex = 0;
   List<dynamic>? _posts = [];
+
+  TextEditingController _authorFilter = TextEditingController();
+  String? _dateStartFilter;
+  String? _dateEndFilter;
 
   Future<List<dynamic>> getData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -29,11 +35,15 @@ class PostsState extends State<Posts> {
     //
     final response = await http.get(
         Uri(
-          host: '192.168.131.28',
-          scheme: 'http',
-          port: 8000,
-          path: '/api/posts',
-        ),
+            host: '192.168.131.28',
+            scheme: 'http',
+            port: 8000,
+            path: '/api/posts',
+            queryParameters: {
+              'author': _authorFilter.text,
+              'date_start': _dateStartFilter,
+              'date_end': _dateEndFilter,
+            }),
         headers: {'Authorization': 'Bearer $token'});
     debugPrint(response.body);
 
@@ -82,6 +92,7 @@ class PostsState extends State<Posts> {
             const Text('Profile'),
           ][_pageIndex],
         ),
+        // bottomSheet: BottomAppBar(child: Text('asd')),
         bottomNavigationBar: NavBar(
           pageIndex: _pageIndex,
           setPageIndex: (index) {
@@ -113,6 +124,116 @@ class PostsState extends State<Posts> {
                       // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        IconButton(
+                          alignment: Alignment.topRight,
+                          onPressed: () {
+                            showModalBottomSheet(
+                              enableDrag: false,
+                              context: context,
+                              showDragHandle: true,
+                              builder: (context) => Padding(
+                                padding: EdgeInsets.only(
+                                  left: 8,
+                                  right: 8,
+                                  top: 8,
+                                  bottom:
+                                      MediaQuery.of(context).viewInsets.bottom,
+                                ),
+                                child: Column(
+                                  // crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Wrap(
+                                      alignment: WrapAlignment.end,
+                                      children: [
+                                        IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _authorFilter.text = '';
+                                              _dateStartFilter = '';
+                                            });
+                                            // Future.delayed(
+                                            //   const Duration(milliseconds: 100),
+                                            //   () {
+                                            //     getData();
+                                            //   },
+                                            // );
+                                            // Navigator.pop(context);
+                                          },
+                                          icon: const Icon(Icons.delete),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _posts = [];
+                                            });
+                                            Future.delayed(
+                                                const Duration(
+                                                    milliseconds: 100), () {
+                                              getData();
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                          style: const ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStatePropertyAll(
+                                              Color(0xFFFF8C00),
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            'Apply',
+                                            style: TextStyle(
+                                              color: Color.fromARGB(
+                                                  255, 255, 255, 255),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    TextFormField(
+                                      autofocus: true,
+                                      controller: _authorFilter,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Author',
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        var date = await showDateRangePicker(
+                                          context: context,
+                                          initialDateRange: DateTimeRange(
+                                              start: DateTime.now(),
+                                              end: DateTime.now()),
+                                          firstDate: DateTime(2000),
+                                          lastDate: DateTime(3000),
+                                        );
+                                        if (date == null) return;
+                                        setState(() {
+                                          _dateStartFilter =
+                                              DateFormat('y-MM-dd')
+                                                  .format(date.start);
+                                        });
+                                      },
+                                      style: const ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStatePropertyAll(
+                                          Color(0xFFFF8C00),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        '''
+Published Date: $_dateStartFilter - $_dateEndFilter''',
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.filter_alt),
+                        ),
                         for (var post in _posts!)
                           PostCard(
                             post: post,
