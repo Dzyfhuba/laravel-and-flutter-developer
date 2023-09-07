@@ -18,6 +18,11 @@ class PostsController extends Controller
     {
         $posts = Post::query();
 
+        if ($request->query('search'))
+            $posts->where(function($query) use ($request) {
+            	$query->where("title", "like", "%{$request->query('search')}%")
+            		->orWhere("content", "like", "%{$request->query('search')}%");
+	    });
         if ($request->query('status'))
             $posts->where('status', $request->query('status'));
         if ($request->query('author'))

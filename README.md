@@ -25,6 +25,9 @@ php artisan db:seed
 php artisan serve --host 0.0.0.0
 ```
 
+4. for Postman API documentation
+import exported file from API Documentation ```laravel/laravel-api.postman_collection.json```
+
 ## Flutter
 > - Dart 3.1
 > - Tested on android only
