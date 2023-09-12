@@ -50,7 +50,7 @@ class CommentCardState extends State<CommentCard> {
     }
     var response = await http.put(
       Uri(
-        host: '192.168.131.28',
+        host: '192.168.160.28',
         port: 8000,
         scheme: 'http',
         path: '/api/posts/comments/${_comment?["id"]}',
@@ -77,7 +77,7 @@ class CommentCardState extends State<CommentCard> {
   void handleThumb(String action) async {
     var response = await http.get(
         Uri(
-          host: '192.168.131.28',
+          host: '192.168.160.28',
           scheme: 'http',
           port: 8000,
           path: '/api/posts/comments/${_comment?["id"]}/$action',
@@ -132,7 +132,7 @@ class CommentCardState extends State<CommentCard> {
                         onDeletePress: () async {
                           var response = await http.delete(
                             Uri(
-                              host: '192.168.131.28',
+                              host: '192.168.160.28',
                               port: 8000,
                               scheme: 'http',
                               path: '/api/posts/comments/${_comment?["id"]}',

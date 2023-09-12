@@ -37,7 +37,7 @@ class RegisterState extends State<Register> {
   Future<bool> formSubmit() async {
     if (_isValid) {
       var data = await http.post(
-        Uri.http("192.168.131.28:8000", '/api/register'),
+        Uri.http("192.168.160.28:8000", '/api/register'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(
           {

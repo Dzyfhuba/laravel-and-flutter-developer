@@ -67,7 +67,7 @@ class LoginForm extends State<LoginPage> {
 
     final response = await http.get(
       Uri(
-        host: '192.168.131.28',
+        host: '192.168.160.28',
         port: 8000,
         scheme: 'http',
         path: 'api/auth/check',
@@ -111,7 +111,7 @@ class LoginForm extends State<LoginPage> {
   Future<bool> formSubmit() async {
     if (_isValid) {
       var data = await http.post(
-        Uri.http("192.168.131.28:8000", '/api/login'),
+        Uri.http("192.168.160.28:8000", '/api/login'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(
           {

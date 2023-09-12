@@ -39,7 +39,7 @@ class PostShowState extends State<PostShow> {
 
     var response = await http.get(
       Uri(
-        host: '192.168.131.28',
+        host: '192.168.160.28',
         scheme: 'http',
         port: 8000,
         path: '/api/posts/${widget.post["id"]}',
@@ -49,7 +49,7 @@ class PostShowState extends State<PostShow> {
 
     var responseComment = await http.get(
       Uri(
-        host: '192.168.131.28',
+        host: '192.168.160.28',
         scheme: 'http',
         port: 8000,
         path: '/api/posts/${widget.post["id"]}/comments',
@@ -92,7 +92,7 @@ class PostShowState extends State<PostShow> {
 
     var response = await http.post(
         Uri(
-          host: '192.168.131.28',
+          host: '192.168.160.28',
           port: 8000,
           scheme: 'http',
           path: '/api/posts/${_post?["id"]}/comments',
@@ -127,7 +127,7 @@ class PostShowState extends State<PostShow> {
   void handleThumb(String action) async {
     var response = await http.get(
         Uri(
-          host: '192.168.131.28',
+          host: '192.168.160.28',
           scheme: 'http',
           port: 8000,
           path: '/api/posts/${_post?["id"]}/$action',
@@ -188,7 +188,7 @@ class PostShowState extends State<PostShow> {
 
     var response = await http.put(
       Uri(
-        host: '192.168.131.28',
+        host: '192.168.160.28',
         port: 8000,
         scheme: 'http',
         path: '/api/posts/${_post?["id"]}',
@@ -317,7 +317,7 @@ class PostShowState extends State<PostShow> {
                                                           await http.delete(
                                                         Uri(
                                                           host:
-                                                              '192.168.131.28',
+                                                              '192.168.160.28',
                                                           port: 8000,
                                                           scheme: 'http',
                                                           path:

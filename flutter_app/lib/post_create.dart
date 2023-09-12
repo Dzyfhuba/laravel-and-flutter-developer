@@ -68,7 +68,7 @@ class PostCreateState extends State<PostCreate> {
     if (!isValidated) return;
     var response = await http.post(
       Uri(
-        host: '192.168.131.28',
+        host: '192.168.160.28',
         port: 8000,
         scheme: 'http',
         path: '/api/posts',

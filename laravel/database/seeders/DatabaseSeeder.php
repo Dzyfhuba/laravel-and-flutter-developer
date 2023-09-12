@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
             Post::create([
                 'title' => $faker->sentence(),
                 'content' => $faker->realText(),
-                'author' => 'test1',
+                'author' => 'admin',
                 'status' => true,
                 'published_date' => $faker->dateTimeBetween('-2 months'),
             ]);

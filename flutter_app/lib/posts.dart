@@ -35,7 +35,7 @@ class PostsState extends State<Posts> {
     //
     final response = await http.get(
         Uri(
-            host: '192.168.131.28',
+            host: '192.168.160.28',
             scheme: 'http',
             port: 8000,
             path: '/api/posts',

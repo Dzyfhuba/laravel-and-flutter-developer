@@ -69,7 +69,7 @@ class ProfileState extends State<Profile> {
                         String token = prefs.getString("token")!;
                         http.get(
                           Uri(
-                              host: '192.168.131.28',
+                              host: '192.168.160.28',
                               port: 8000,
                               scheme: 'http',
                               path: '/api/logout'),
